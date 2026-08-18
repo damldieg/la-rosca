@@ -1,8 +1,8 @@
 import { useAtomValue } from 'jotai'
-import { GameOverScreen } from '@/screens/GameOverScreen'
-import { GameScreen } from '@/screens/GameScreen'
-import { StartScreen } from '@/screens/StartScreen'
-import { gameSessionAtom } from '@/store/gameSession'
+import { GameOverScreen } from '@/ui/screens/GameOverScreen'
+import { GameScreen } from '@/ui/screens/GameScreen'
+import { StartScreen } from '@/ui/screens/StartScreen'
+import { gameSessionAtom } from '@/ui/state/gameSession'
 
 function App() {
   const session = useAtomValue(gameSessionAtom)

@@ -20,26 +20,41 @@ FACTS:
 - id:[manifest:pnpm-lock.yaml] evidence:pnpm-lock.yaml
 - id:[config:vite.config.ts] evidence:vite.config.ts
 - id:[config:tsconfig.json] evidence:tsconfig.json
-- id:[language:TypeScript] value:3 evidence:scan
+- id:[language:TypeScript] value:58 evidence:scan
 - id:[technology:react] evidence:package.json
 - id:[technology:vite] evidence:package.json
 - id:[technology:tsconfig.json] evidence:config file
+- id:[dependency:@fontsource-variable/geist] value:"^5.3.0" evidence:package.json
 - id:[dependency:@juntia/juntia] value:"^0.15.0" evidence:package.json
+- id:[dependency:class-variance-authority] value:"^0.7.1" evidence:package.json
+- id:[dependency:clsx] value:"^2.1.1" evidence:package.json
+- id:[dependency:jotai] value:"^2.20.2" evidence:package.json
+- id:[dependency:lucide-react] value:"^1.32.0" evidence:package.json
+- id:[dependency:radix-ui] value:"^1.6.7" evidence:package.json
 - id:[dependency:react] value:"^19.2.8" evidence:package.json
 - id:[dependency:react-dom] value:"^19.2.8" evidence:package.json
+- id:[dependency:tailwind-merge] value:"^3.6.0" evidence:package.json
+- id:[dependency:@tailwindcss/vite] value:"^4.3.3" evidence:package.json
 - id:[dependency:@types/node] value:"^24.13.3" evidence:package.json
 - id:[dependency:@types/react] value:"^19.2.17" evidence:package.json
 - id:[dependency:@types/react-dom] value:"^19.2.3" evidence:package.json
 - id:[dependency:@vitejs/plugin-react] value:"^6.0.4" evidence:package.json
 - id:[dependency:oxlint] value:"^1.75.0" evidence:package.json
+- id:[dependency:shadcn] value:"^4.18.0" evidence:package.json
+- id:[dependency:tailwindcss] value:"^4.3.3" evidence:package.json
+- id:[dependency:tw-animate-css] value:"^1.4.0" evidence:package.json
 - id:[dependency:typescript] value:"~6.0.2" evidence:package.json
 - id:[dependency:vite] value:"^8.2.0" evidence:package.json
+- id:[dependency:vitest] value:"^4.1.11" evidence:package.json
+- id:[structure.directory:dist] evidence:scan
 - id:[structure.directory:public] evidence:scan
 - id:[structure.directory:src] evidence:scan
 - id:[structure.file:.gitignore] evidence:scan
 - id:[structure.file:.oxlintrc.json] evidence:scan
+- id:[managed.file:CLAUDE.md] evidence:scan
 - id:[structure.file:LICENSE] evidence:scan
 - id:[structure.file:README.md] evidence:scan
+- id:[structure.file:components.json] evidence:scan
 - id:[structure.file:index.html] evidence:scan
 - id:[structure.file:package.json] evidence:scan
 - id:[structure.file:pnpm-lock.yaml] evidence:scan
@@ -52,7 +67,7 @@ CHANGES:
 No changes since the previous scan (or this is the first scan).
 
 EXISTING CONTEXT:
-(none persisted yet — Juntia has no confirmed decision for this project)
+- Vitest: agregar como devDependency. Se integra directo con vite.config.ts existente, cero config adicional, soporta TS nativamente. Estandar de facto para proyectos Vite.
 ```
 
 `.juntia/context.md` has the same confirmed decisions in human-readable form, if useful.
