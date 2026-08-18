@@ -49,4 +49,24 @@ describe('getEligibleEvents', () => {
 
     expect(state).toEqual(snapshot)
   })
+
+  it('excludes an event already resolved in history, even if its conditions still hold', () => {
+    const state = {
+      ...createInitialGameState(),
+      history: [{ decisionId: 'unconditional_event:ok', gameDate: { years: 18, months: 0 }, effects: {} }],
+    }
+
+    const eligible = getEligibleEvents([punteroEvent, unconditionalEvent], state)
+
+    expect(eligible).toEqual([punteroEvent])
+  })
+
+  it('returns an empty pool once every eligible event has been resolved', () => {
+    const state = {
+      ...createInitialGameState(),
+      history: [{ decisionId: 'puntero_event:ok', gameDate: { years: 18, months: 0 }, effects: {} }],
+    }
+
+    expect(getEligibleEvents([punteroEvent], state)).toEqual([])
+  })
 })

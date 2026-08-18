@@ -11,11 +11,13 @@ export const elEmpresario: Event = {
       text: 'Aceptar el trato',
       addFlags: ['businessman_ally'],
       effects: { money: 30, corruption: 5 },
+      durationMonths: 2,
     },
     {
       id: 'reject_partnership',
       text: 'Rechazar el trato',
       effects: { popularity: 2 },
+      durationMonths: 1,
     },
   ],
 }

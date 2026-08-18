@@ -17,11 +17,13 @@ export const laLicitacion: Event = {
       text: 'Favorecer a tu socio en la licitación',
       addFlags: ['accepted_bribe'],
       effects: { money: 50, corruption: 15, impunity: -10 },
+      durationMonths: 4,
     },
     {
       id: 'clean_bid',
       text: 'Votar por la oferta más conveniente para el municipio',
       effects: { popularity: 10, structure: 5 },
+      durationMonths: 4,
     },
   ],
 }

@@ -11,11 +11,13 @@ export const clubDelBarrio: Event = {
       text: 'Conseguir los materiales y ayudar con la obra',
       addFlags: ['helped_local_club'],
       effects: { popularity: 5 },
+      durationMonths: 3,
     },
     {
       id: 'ignore_club',
       text: 'No tenés tiempo para eso',
       effects: { popularity: -2 },
+      durationMonths: 1,
     },
   ],
 }

@@ -16,11 +16,13 @@ export const elPeriodista: Event = {
       id: 'bribe_journalist',
       text: 'Pagarle para que no publique',
       effects: { money: -20, impunity: 15, corruption: 5 },
+      durationMonths: 1,
     },
     {
       id: 'let_him_publish',
       text: 'Dejar que publique la nota',
       effects: { popularity: -15 },
+      durationMonths: 1,
     },
   ],
 }

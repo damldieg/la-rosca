@@ -17,11 +17,13 @@ export const laOportunidad: Event = {
       text: 'Aceptar la candidatura',
       role: 'concejal',
       effects: { power: 10, popularity: 5 },
+      durationMonths: 8,
     },
     {
       id: 'decline_candidacy',
       text: 'Rechazar, todavía no estás listo',
       effects: { popularity: 2 },
+      durationMonths: 1,
     },
   ],
 }

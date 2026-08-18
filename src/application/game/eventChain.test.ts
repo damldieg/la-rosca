@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { clubDelBarrio } from '../../content/events/clubDelBarrio'
 import { defaultEventPool } from '../../content/events'
+import { elDebateMunicipal } from '../../content/events/elDebateMunicipal'
 import { elEmpresario } from '../../content/events/elEmpresario'
 import { laLicitacion } from '../../content/events/laLicitacion'
 import { laOportunidad } from '../../content/events/laOportunidad'
@@ -35,7 +36,7 @@ describe('event chain: el empresario -> la licitación', () => {
 
     const eligible = getEligibleEvents(defaultEventPool, state)
     expect(eligible.map((e) => e.id)).not.toContain('la_licitacion')
-    expect(getNextEvent(state)).toBeNull()
+    expect(getNextEvent(state)).toEqual(elDebateMunicipal)
   })
 })
 
