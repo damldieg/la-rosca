@@ -16,6 +16,7 @@ export const elDebateMunicipal: Event = {
     {
       id: 'atacar_oposicion',
       text: 'Atacar a la oposición',
+      addFlags: ['confronted_opposition'],
       effects: { power: 8, popularity: -5, corruption: 3 },
       durationMonths: 2,
     },

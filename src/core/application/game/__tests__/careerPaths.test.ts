@@ -28,6 +28,19 @@ function playToTheEnd(partyId: PartyId): { state: GameState; eventIds: string[] 
   return { state, eventIds }
 }
 
+describe('parties start with a different political network', () => {
+  it('each party begins with distinct initial relationships, shaping which chains open first', () => {
+    const popular = startGame('popular')
+    const liberal = startGame('liberal')
+    const progresista = startGame('progresista')
+
+    expect(popular.relationships.sindicalista).toBeGreaterThan(0)
+    expect(liberal.relationships.empresario).toBeGreaterThan(0)
+    expect(progresista.relationships.periodista).toBeGreaterThan(0)
+    expect(popular.relationships).not.toEqual(liberal.relationships)
+  })
+})
+
 describe('party choice diverges the playthrough', () => {
   it('a popular-party player can see el_sindicato but never the liberal-only or asesor content', () => {
     const state = startGame('popular')
@@ -80,6 +93,40 @@ describe('a full playthrough differs by party', () => {
       const { state } = playToTheEnd(partyId)
       expect(getNextEvent(state)).toBeNull()
     }
+  })
+})
+
+describe('career reaches senador/ministro/presidente only through events, never through age', () => {
+  it('the full ladder above concejal requires the partido chain and threshold events, not age', () => {
+    const senadorReady = {
+      ...startGame('popular'),
+      role: 'senador' as const,
+      power: 60,
+    }
+    expect(getEligibleEvents(defaultEventPool, senadorReady).map((e) => e.id)).toContain('el_gabinete')
+
+    const ministroReady = { ...senadorReady, role: 'ministro' as const, power: 80 }
+    expect(getEligibleEvents(defaultEventPool, ministroReady).map((e) => e.id)).toContain('la_presidencia')
+  })
+
+  it('reaching senador stays blocked below el_ascenso power/relationship requirements even at old age', () => {
+    const veryOldButUnearned = {
+      ...startGame('popular'),
+      age: 90,
+      role: 'concejal' as const,
+      flags: ['confronted_opposition'],
+      relationships: { jefePartidario: 10 }, // below el_ascenso's 40 threshold
+    }
+
+    expect(getEligibleEvents(defaultEventPool, veryOldButUnearned).map((e) => e.id)).not.toContain('el_ascenso')
+  })
+
+  it('age has no bearing on promotion eligibility — only the underlying stats/relationships do', () => {
+    const young = { ...startGame('popular'), role: 'senador' as const, power: 60, age: 19 }
+    const old = { ...young, age: 95 }
+
+    expect(getEligibleEvents(defaultEventPool, young).map((e) => e.id)).toContain('el_gabinete')
+    expect(getEligibleEvents(defaultEventPool, old).map((e) => e.id)).toContain('el_gabinete')
   })
 })
 

@@ -12,6 +12,7 @@ export const progresista: PoliticalParty = {
     popularity: 35,
   },
   preferredStats: ['popularity'],
-  availableRoles: ['puntero', 'asesor', 'concejal', 'diputado'],
+  initialRelationships: { periodista: 15, empresario: -5 },
+  availableRoles: ['puntero', 'asesor', 'concejal', 'diputado', 'senador', 'ministro'],
   preferredEventTags: ['mediático', 'social'],
 }

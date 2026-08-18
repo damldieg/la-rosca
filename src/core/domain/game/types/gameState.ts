@@ -1,6 +1,15 @@
 import type { PartyId } from '../../party/types'
 
-export type Role = 'puntero' | 'concejal' | 'asesor' | 'intendente' | 'diputado' | 'gobernador'
+export type Role =
+  | 'puntero'
+  | 'concejal'
+  | 'asesor'
+  | 'intendente'
+  | 'diputado'
+  | 'senador'
+  | 'gobernador'
+  | 'ministro'
+  | 'presidente'
 
 /** Elapsed in-game time, precise to the month. */
 export interface GameDate {

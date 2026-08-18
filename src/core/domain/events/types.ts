@@ -1,11 +1,11 @@
 import type { Decision } from '../game/types/decision'
-import type { DecisionEffects, Ideology, Role } from '../game/types/gameState'
+import type { DecisionEffects, Ideology, RelationshipId, Role } from '../game/types/gameState'
 import type { PartyId } from '../party/types'
 
 /**
  * A discriminated-union tree: leaf conditions (role, flag, stat, party, ideology,
- * age) plus AND/OR combinators. A new leaf type (relationships, ...) can be added
- * later as another union member without changing evaluateCondition's shape.
+ * age, relationship) plus AND/OR combinators. A new leaf type can be added later
+ * as another union member without changing evaluateCondition's shape.
  */
 export type Condition =
   | RoleCondition
@@ -14,6 +14,7 @@ export type Condition =
   | PartyCondition
   | IdeologyCondition
   | AgeCondition
+  | RelationshipCondition
   | AndCondition
   | OrCondition
 
@@ -57,6 +58,13 @@ export interface AgeCondition {
   value: number
 }
 
+export interface RelationshipCondition {
+  type: 'relationship'
+  target: RelationshipId
+  operator: NumericOperator
+  value: number
+}
+
 export interface AndCondition {
   type: 'and'
   conditions: Condition[]
@@ -73,10 +81,25 @@ export interface EventChoice extends Omit<Decision, 'id'> {
   text: string
 }
 
+/**
+ * How an event's own past occurrences affect its future eligibility, on top of
+ * (never instead of) its `conditions`. Defaults to `oneShot` when omitted, so
+ * every event authored before this field existed keeps its original behavior.
+ */
+export type EventLifecycle =
+  | { type: 'oneShot' }
+  | { type: 'repeatable' }
+  | { type: 'cooldown'; months: number }
+  | { type: 'milestone' }
+
 export interface Event {
   id: string
   title: string
   description: string
   conditions?: Condition
+  /** Defaults to oneShot — see EventLifecycle. */
+  lifecycle?: EventLifecycle
+  /** Purely descriptive grouping for authoring/UI — never read by eligibility logic. */
+  chainId?: string
   choices: EventChoice[]
 }

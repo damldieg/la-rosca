@@ -1,5 +1,5 @@
 import type { Decision } from '../game/types/decision'
-import type { HistoryEntry } from '../game/types/gameState'
+import type { GameDate, HistoryEntry } from '../game/types/gameState'
 import type { Event, EventChoice } from './types'
 
 const DECISION_ID_SEPARATOR = ':'
@@ -9,7 +9,17 @@ export function choiceToDecision(event: Event, choice: EventChoice): Decision {
   return { id: `${event.id}${DECISION_ID_SEPARATOR}${id}`, ...effects }
 }
 
+function eventIdOf(decisionId: string): string {
+  return decisionId.split(DECISION_ID_SEPARATOR)[0]
+}
+
 /** Event ids already resolved by a past decision, derived from history — no separate "seen" state to track. */
 export function resolvedEventIds(history: HistoryEntry[]): Set<string> {
-  return new Set(history.map((entry) => entry.decisionId.split(DECISION_ID_SEPARATOR)[0]))
+  return new Set(history.map((entry) => eventIdOf(entry.decisionId)))
+}
+
+/** The gameDate of the most recent past occurrence of an event, or null if it never happened. */
+export function lastOccurrenceDate(history: HistoryEntry[], eventId: string): GameDate | null {
+  const occurrences = history.filter((entry) => eventIdOf(entry.decisionId) === eventId)
+  return occurrences.length > 0 ? occurrences[occurrences.length - 1].gameDate : null
 }

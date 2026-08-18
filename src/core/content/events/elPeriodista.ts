@@ -12,17 +12,22 @@ export const elPeriodista: Event = {
       { type: 'flag', flag: 'accepted_bribe', operator: 'exists' },
     ],
   },
+  chainId: 'periodista',
   choices: [
     {
       id: 'bribe_journalist',
       text: 'Pagarle para que no publique',
+      addFlags: ['scandal_exposed'],
       effects: { money: -MONEY_SCALE.BRIBE_TO_JOURNALIST, impunity: 15, corruption: 5 },
+      relationships: { periodista: -15 },
       durationMonths: 1,
     },
     {
       id: 'let_him_publish',
       text: 'Dejar que publique la nota',
+      addFlags: ['scandal_exposed'],
       effects: { popularity: -15 },
+      relationships: { periodista: 10 },
       durationMonths: 1,
     },
   ],

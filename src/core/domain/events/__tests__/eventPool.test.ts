@@ -58,6 +58,14 @@ const highPowerEvent: Event = {
   choices: [{ id: 'ok', text: 'ok' }],
 }
 
+const trustedByEmpresarioEvent: Event = {
+  id: 'trusted_by_empresario_event',
+  title: 'Trusted by empresario event',
+  description: '',
+  conditions: { type: 'relationship', target: 'empresario', operator: 'gte', value: 50 },
+  choices: [{ id: 'ok', text: 'ok' }],
+}
+
 const adultEvent: Event = {
   id: 'adult_event',
   title: 'Adult event',
@@ -124,6 +132,14 @@ describe('getEligibleEvents', () => {
 
     expect(getEligibleEvents([highPowerEvent], lowPower)).toEqual([])
     expect(getEligibleEvents([highPowerEvent], highPower)).toEqual([highPowerEvent])
+  })
+
+  it('a relationship can unlock an event', () => {
+    const distrusted = freshState()
+    const trusted = { ...freshState(), relationships: { empresario: 65 } }
+
+    expect(getEligibleEvents([trustedByEmpresarioEvent], distrusted)).toEqual([])
+    expect(getEligibleEvents([trustedByEmpresarioEvent], trusted)).toEqual([trustedByEmpresarioEvent])
   })
 
   it('an event can depend on age', () => {

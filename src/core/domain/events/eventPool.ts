@@ -1,15 +1,16 @@
 import type { GameState } from '../game/types/gameState'
 import { evaluateConditions } from './conditionEngine'
-import { resolvedEventIds } from './toDecision'
+import { isLifecycleEligible } from './eventLifecycle'
 import type { Event } from './types'
 
 export type EventPool = Event[]
 
 /**
- * An event already resolved (its id appears in history) is excluded — otherwise a
- * still-eligible event would resurface indefinitely, and the pool could never run dry.
+ * An event is eligible when its conditions hold AND its own lifecycle (oneShot,
+ * repeatable, cooldown, milestone — see EventLifecycle) still allows it given
+ * what's already in history. Without this, an oneShot event would resurface
+ * indefinitely and the pool could never run dry.
  */
 export function getEligibleEvents(pool: EventPool, state: GameState): Event[] {
-  const resolved = resolvedEventIds(state.history)
-  return pool.filter((event) => !resolved.has(event.id) && evaluateConditions(event.conditions, state))
+  return pool.filter((event) => isLifecycleEligible(event, state) && evaluateConditions(event.conditions, state))
 }

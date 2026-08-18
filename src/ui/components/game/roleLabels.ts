@@ -6,7 +6,10 @@ export const ROLE_LABELS: Record<Role, string> = {
   asesor: 'Asesor',
   intendente: 'Intendente',
   diputado: 'Diputado',
+  senador: 'Senador',
   gobernador: 'Gobernador',
+  ministro: 'Ministro',
+  presidente: 'Presidente',
 }
 
 /** Presentation-only flavor — not part of GameState, never read by Domain/Application. */

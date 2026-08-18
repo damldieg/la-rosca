@@ -80,6 +80,76 @@ describe('evaluateCondition', () => {
     expect(evaluateCondition({ type: 'ideology', axis: 'social', operator: 'gte', value: 50 }, state)).toBe(false)
   })
 
+  it('relationship condition compares the given target, defaulting to 0 when absent', () => {
+    const state = { ...freshState(), relationships: { empresario: 65 } }
+
+    expect(evaluateCondition({ type: 'relationship', target: 'empresario', operator: 'gte', value: 50 }, state)).toBe(
+      true,
+    )
+    expect(evaluateCondition({ type: 'relationship', target: 'empresario', operator: 'lt', value: 50 }, state)).toBe(
+      false,
+    )
+    expect(
+      evaluateCondition({ type: 'relationship', target: 'periodista', operator: 'eq', value: 0 }, freshState()),
+    ).toBe(true)
+  })
+
+  it('combines relationship + stat in a single AND', () => {
+    const state = { ...freshState(), relationships: { empresario: 60 }, money: 100 }
+    const condition: Condition = {
+      type: 'and',
+      conditions: [
+        { type: 'relationship', target: 'empresario', operator: 'gte', value: 50 },
+        { type: 'stat', stat: 'money', operator: 'gte', value: 100 },
+      ],
+    }
+
+    expect(evaluateCondition(condition, state)).toBe(true)
+    expect(evaluateCondition(condition, { ...state, money: 0 })).toBe(false)
+  })
+
+  it('combines relationship + party in a single AND', () => {
+    const state = { ...freshState(), relationships: { sindicalista: 40 } } // party: 'popular'
+    const condition: Condition = {
+      type: 'and',
+      conditions: [
+        { type: 'relationship', target: 'sindicalista', operator: 'gte', value: 30 },
+        { type: 'party', operator: 'equals', value: 'popular' },
+      ],
+    }
+
+    expect(evaluateCondition(condition, state)).toBe(true)
+    expect(evaluateCondition(condition, { ...state, party: 'liberal' })).toBe(false)
+  })
+
+  it('combines relationship + role in a single AND', () => {
+    const state = { ...freshState(), relationships: { jefePartidario: 45 }, role: 'concejal' as const }
+    const condition: Condition = {
+      type: 'and',
+      conditions: [
+        { type: 'relationship', target: 'jefePartidario', operator: 'gte', value: 40 },
+        { type: 'role', operator: 'equals', value: 'concejal' },
+      ],
+    }
+
+    expect(evaluateCondition(condition, state)).toBe(true)
+    expect(evaluateCondition(condition, { ...state, role: 'puntero' as const })).toBe(false)
+  })
+
+  it('combines relationship + flag in a single AND', () => {
+    const state = { ...freshState(), relationships: { fiscal: 20 }, flags: ['negotiated_with_prosecutor'] }
+    const condition: Condition = {
+      type: 'and',
+      conditions: [
+        { type: 'relationship', target: 'fiscal', operator: 'gte', value: 10 },
+        { type: 'flag', flag: 'negotiated_with_prosecutor', operator: 'exists' },
+      ],
+    }
+
+    expect(evaluateCondition(condition, state)).toBe(true)
+    expect(evaluateCondition(condition, { ...state, flags: [] })).toBe(false)
+  })
+
   it('age condition compares the current age', () => {
     const state = freshState() // age starts at 18
 
