@@ -1,17 +1,33 @@
 import { describe, expect, it } from 'vitest'
+import type { PoliticalParty } from '../../../party/types'
 import { createInitialGameState } from '../../state/initialState'
 import { applyDecision } from '../applyDecision'
 
+const testParty: PoliticalParty = {
+  id: 'popular',
+  name: 'Test Party',
+  description: '',
+  ideology: { economic: 0, social: 0, institutional: 0 },
+  startingStats: {},
+  preferredStats: [],
+  availableRoles: ['puntero'],
+  preferredEventTags: [],
+}
+
+function freshState() {
+  return createInitialGameState(testParty)
+}
+
 describe('applyDecision', () => {
   it('modifies money', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const newState = applyDecision(state, { id: 'sell_favor', effects: { money: 20 } })
 
     expect(newState.money).toBe(state.money + 20)
   })
 
   it('modifies multiple stats at once', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const newState = applyDecision(state, {
       id: 'accept_bribe',
       effects: { money: 20, corruption: 10, power: -5 },
@@ -23,7 +39,7 @@ describe('applyDecision', () => {
   })
 
   it('keeps 0-100 stats within bounds', () => {
-    const state = createInitialGameState()
+    const state = freshState()
 
     const overMax = applyDecision(state, { id: 'huge_gain', effects: { power: 1000 } })
     expect(overMax.power).toBe(100)
@@ -33,7 +49,7 @@ describe('applyDecision', () => {
   })
 
   it('keeps relationships within -100/+100', () => {
-    const state = createInitialGameState()
+    const state = freshState()
 
     const overMax = applyDecision(state, {
       id: 'huge_favor',
@@ -49,7 +65,7 @@ describe('applyDecision', () => {
   })
 
   it('modifies relationships incrementally', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const newState = applyDecision(state, {
       id: 'deal',
       relationships: { businessman: 15, unionLeader: -10 },
@@ -58,15 +74,25 @@ describe('applyDecision', () => {
     expect(newState.relationships).toEqual({ businessman: 15, unionLeader: -10 })
   })
 
+  it('modifies ideology axes independently and keeps them within -100/+100', () => {
+    const state = freshState()
+    const newState = applyDecision(state, { id: 'shift', ideology: { economic: 15, social: -10 } })
+
+    expect(newState.ideology).toEqual({ economic: 15, social: -10, institutional: 0 })
+
+    const overMax = applyDecision(state, { id: 'huge_shift', ideology: { economic: 1000 } })
+    expect(overMax.ideology.economic).toBe(100)
+  })
+
   it('adds flags', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const newState = applyDecision(state, { id: 'club', addFlags: ['helped_local_club'] })
 
     expect(newState.flags).toContain('helped_local_club')
   })
 
   it('removes flags', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const withFlag = applyDecision(state, { id: 'club', addFlags: ['helped_local_club'] })
     const withoutFlag = applyDecision(withFlag, { id: 'reversal', removeFlags: ['helped_local_club'] })
 
@@ -74,7 +100,7 @@ describe('applyDecision', () => {
   })
 
   it('advances time by durationMonths', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const newState = applyDecision(state, { id: 'wait', durationMonths: 3 })
 
     expect(newState.date).toEqual({ years: 18, months: 3 })
@@ -82,14 +108,14 @@ describe('applyDecision', () => {
   })
 
   it('changes the role', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const newState = applyDecision(state, { id: 'promotion', role: 'concejal' })
 
     expect(newState.role).toBe('concejal')
   })
 
   it('registers the decision in history', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const newState = applyDecision(state, {
       id: 'accept_bribe',
       effects: { money: 20 },
@@ -105,13 +131,14 @@ describe('applyDecision', () => {
   })
 
   it('does not mutate the original state', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const snapshot = structuredClone(state)
 
     applyDecision(state, {
       id: 'accept_bribe',
       effects: { money: 20, corruption: 10 },
       relationships: { businessman: 15 },
+      ideology: { economic: 5 },
       addFlags: ['accepted_bribe'],
       durationMonths: 3,
       role: 'concejal',

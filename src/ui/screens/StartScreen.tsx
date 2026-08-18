@@ -1,10 +1,10 @@
 import { useSetAtom } from 'jotai'
 import { Button } from '@/ui/components/ui/button'
 import { OrnamentDivider } from '@/ui/components/game/OrnamentDivider'
-import { startGameAtom } from '@/ui/state/gameSession'
+import { goToPartySelectionAtom } from '@/ui/state/gameSession'
 
 export function StartScreen() {
-  const startGame = useSetAtom(startGameAtom)
+  const goToPartySelection = useSetAtom(goToPartySelectionAtom)
 
   return (
     <main className="flex min-h-svh flex-col items-center justify-center gap-8 px-6 text-center">
@@ -21,7 +21,7 @@ export function StartScreen() {
         </p>
       </div>
 
-      <Button size="lg" className="px-10 text-base" onClick={() => startGame()}>
+      <Button size="lg" className="px-10 text-base" onClick={() => goToPartySelection()}>
         Nueva partida
       </Button>
     </main>

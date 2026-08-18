@@ -1,3 +1,4 @@
+import { MONEY_SCALE } from '../../domain/game/economy'
 import type { Event } from '../../domain/events/types'
 
 export const laLicitacion: Event = {
@@ -16,7 +17,7 @@ export const laLicitacion: Event = {
       id: 'favor_empresario',
       text: 'Favorecer a tu socio en la licitación',
       addFlags: ['accepted_bribe'],
-      effects: { money: 50, corruption: 15, impunity: -10 },
+      effects: { money: MONEY_SCALE.RIGGED_BID_PAYOUT, corruption: 15, impunity: -10 },
       durationMonths: 4,
     },
     {

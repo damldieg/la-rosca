@@ -1,8 +1,20 @@
 import { describe, expect, it } from 'vitest'
 import { createInitialGameState } from '../../game/state/initialState'
 import { applyDecision } from '../../game/engine/applyDecision'
+import type { PoliticalParty } from '../../party/types'
 import { choiceToDecision } from '../toDecision'
 import type { Event } from '../types'
+
+const testParty: PoliticalParty = {
+  id: 'popular',
+  name: 'Test Party',
+  description: '',
+  ideology: { economic: 0, social: 0, institutional: 0 },
+  startingStats: {},
+  preferredStats: [],
+  availableRoles: ['puntero'],
+  preferredEventTags: [],
+}
 
 const event: Event = {
   id: 'club_del_barrio',
@@ -25,7 +37,7 @@ describe('choiceToDecision', () => {
   })
 
   it('the resulting Decision is compatible with applyDecision', () => {
-    const state = createInitialGameState()
+    const state = createInitialGameState(testParty)
     const decision = choiceToDecision(event, event.choices[0])
     const newState = applyDecision(state, decision)
 

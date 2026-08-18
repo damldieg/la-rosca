@@ -1,8 +1,7 @@
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import { Button } from '@/ui/components/ui/button'
-import type { DecisionEffects } from '@/core/domain/game/types/gameState'
-import type { GameState } from '@/core/domain/game/types/gameState'
-import { formatStatDelta } from './statLabels'
+import type { DecisionEffects, GameState, Ideology } from '@/core/domain/game/types/gameState'
+import { formatIdeologyDelta, formatStatDelta } from './statLabels'
 import { ROLE_LABELS } from './roleLabels'
 
 const DELTA_KEYS = Object.keys({
@@ -12,8 +11,13 @@ const DELTA_KEYS = Object.keys({
   corruption: 0,
   impunity: 0,
   structure: 0,
-  ideologyAlignment: 0,
 } satisfies Record<keyof DecisionEffects, number>) as (keyof DecisionEffects)[]
+
+const IDEOLOGY_AXES = Object.keys({
+  economic: 0,
+  social: 0,
+  institutional: 0,
+} satisfies Record<keyof Ideology, number>) as (keyof Ideology)[]
 
 export function ConsequencesPanel({
   previousState,
@@ -24,9 +28,13 @@ export function ConsequencesPanel({
   state: GameState
   onContinue: () => void
 }) {
-  const deltas = DELTA_KEYS.map((key) => ({ key, delta: state[key] - previousState[key] })).filter(
+  const statDeltas = DELTA_KEYS.map((key) => ({ key, delta: state[key] - previousState[key] })).filter(
     ({ delta }) => delta !== 0,
   )
+  const ideologyDeltas = IDEOLOGY_AXES.map((axis) => ({
+    axis,
+    delta: state.ideology[axis] - previousState.ideology[axis],
+  })).filter(({ delta }) => delta !== 0)
   const promoted = state.role !== previousState.role
 
   return (
@@ -34,7 +42,7 @@ export function ConsequencesPanel({
       <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">Consecuencias</p>
 
       <ul className="flex flex-col gap-2">
-        {deltas.map(({ key, delta }) => (
+        {statDeltas.map(({ key, delta }) => (
           <li
             key={key}
             className={`flex items-center gap-2 text-sm font-medium ${delta > 0 ? 'text-olive' : 'text-destructive'}`}
@@ -43,7 +51,15 @@ export function ConsequencesPanel({
             <span>{formatStatDelta(key, delta)}</span>
           </li>
         ))}
-        {deltas.length === 0 && <li className="text-sm text-muted-foreground">Sin cambios en tus números.</li>}
+        {ideologyDeltas.map(({ axis, delta }) => (
+          <li key={axis} className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            {delta > 0 ? <ArrowUp className="size-4" aria-hidden="true" /> : <ArrowDown className="size-4" aria-hidden="true" />}
+            <span>{formatIdeologyDelta(axis, delta)}</span>
+          </li>
+        ))}
+        {statDeltas.length === 0 && ideologyDeltas.length === 0 && (
+          <li className="text-sm text-muted-foreground">Sin cambios en tus números.</li>
+        )}
       </ul>
 
       {promoted && (

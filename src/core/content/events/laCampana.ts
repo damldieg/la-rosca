@@ -1,3 +1,4 @@
+import { MONEY_SCALE } from '../../domain/game/economy'
 import type { Event } from '../../domain/events/types'
 
 export const laCampana: Event = {
@@ -15,7 +16,7 @@ export const laCampana: Event = {
     {
       id: 'gastar_en_boletas',
       text: 'Pagar boletas y pasacalles',
-      effects: { money: -15, structure: 8 },
+      effects: { money: -MONEY_SCALE.SMALL_CAMPAIGN_COST, structure: 8 },
       durationMonths: 3,
     },
   ],

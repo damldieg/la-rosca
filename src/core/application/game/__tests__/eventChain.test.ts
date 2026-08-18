@@ -12,7 +12,7 @@ import { startGame } from '../startGame'
 
 describe('event chain: el empresario -> la licitación', () => {
   it('appears once the player accepted the businessman and became concejal', () => {
-    let state = startGame()
+    let state = startGame('popular')
     state = chooseEvent(state, clubDelBarrio, clubDelBarrio.choices[0]) // help_club
     state = chooseEvent(state, elEmpresario, elEmpresario.choices[0]) // accept_partnership -> businessman_ally
     state = chooseEvent(state, laOportunidad, laOportunidad.choices[0]) // accept_candidacy -> concejal
@@ -26,7 +26,7 @@ describe('event chain: el empresario -> la licitación', () => {
   })
 
   it('stays blocked if the player rejected the businessman', () => {
-    let state = startGame()
+    let state = startGame('popular')
     state = chooseEvent(state, clubDelBarrio, clubDelBarrio.choices[0]) // help_club
     state = chooseEvent(state, elEmpresario, elEmpresario.choices[1]) // reject_partnership -> no flag
     state = chooseEvent(state, laOportunidad, laOportunidad.choices[0]) // accept_candidacy -> concejal
@@ -42,7 +42,7 @@ describe('event chain: el empresario -> la licitación', () => {
 
 describe('getNextEvent', () => {
   it('returns a deterministic first eligible event for a fresh game', () => {
-    const state = startGame()
+    const state = startGame('popular')
 
     expect(getNextEvent(state)).toEqual(clubDelBarrio)
   })

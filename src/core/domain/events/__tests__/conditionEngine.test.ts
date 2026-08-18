@@ -1,39 +1,94 @@
 import { describe, expect, it } from 'vitest'
 import { createInitialGameState } from '../../game/state/initialState'
+import type { PoliticalParty } from '../../party/types'
 import { evaluateCondition, evaluateConditions } from '../conditionEngine'
 import type { Condition } from '../types'
 
+const testParty: PoliticalParty = {
+  id: 'popular',
+  name: 'Test Party',
+  description: '',
+  ideology: { economic: 0, social: 0, institutional: 0 },
+  startingStats: {},
+  preferredStats: [],
+  availableRoles: ['puntero'],
+  preferredEventTags: [],
+}
+
+function freshState() {
+  return createInitialGameState(testParty)
+}
+
 describe('evaluateCondition', () => {
   it('role condition is true when the role matches', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const condition: Condition = { type: 'role', operator: 'equals', value: 'puntero' }
 
     expect(evaluateCondition(condition, state)).toBe(true)
   })
 
   it('role condition is false when the role does not match', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const condition: Condition = { type: 'role', operator: 'equals', value: 'concejal' }
 
     expect(evaluateCondition(condition, state)).toBe(false)
   })
 
   it('flag "exists" condition is true when the flag is present', () => {
-    const state = { ...createInitialGameState(), flags: ['accepted_bribe'] }
+    const state = { ...freshState(), flags: ['accepted_bribe'] }
     const condition: Condition = { type: 'flag', flag: 'accepted_bribe', operator: 'exists' }
 
     expect(evaluateCondition(condition, state)).toBe(true)
   })
 
   it('flag "exists" condition is false when the flag is absent', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const condition: Condition = { type: 'flag', flag: 'accepted_bribe', operator: 'exists' }
 
     expect(evaluateCondition(condition, state)).toBe(false)
   })
 
+  it.each([
+    ['eq', 10, true],
+    ['neq', 10, false],
+    ['gt', 5, true],
+    ['gte', 10, true],
+    ['lt', 20, true],
+    ['lte', 10, true],
+    ['gt', 10, false],
+    ['lt', 10, false],
+  ] as const)('stat condition power %s %d -> %s', (operator, value, expected) => {
+    const state = freshState() // power starts at 10
+    const condition: Condition = { type: 'stat', stat: 'power', operator, value }
+
+    expect(evaluateCondition(condition, state)).toBe(expected)
+  })
+
+  it('party condition compares the current party', () => {
+    const state = freshState() // party: 'popular'
+
+    expect(evaluateCondition({ type: 'party', operator: 'equals', value: 'popular' }, state)).toBe(true)
+    expect(evaluateCondition({ type: 'party', operator: 'equals', value: 'liberal' }, state)).toBe(false)
+    expect(evaluateCondition({ type: 'party', operator: 'not_equals', value: 'liberal' }, state)).toBe(true)
+  })
+
+  it('ideology condition compares the given axis', () => {
+    const party: PoliticalParty = { ...testParty, ideology: { economic: 60, social: 0, institutional: 0 } }
+    const state = createInitialGameState(party)
+
+    expect(evaluateCondition({ type: 'ideology', axis: 'economic', operator: 'gte', value: 50 }, state)).toBe(true)
+    expect(evaluateCondition({ type: 'ideology', axis: 'social', operator: 'gte', value: 50 }, state)).toBe(false)
+  })
+
+  it('age condition compares the current age', () => {
+    const state = freshState() // age starts at 18
+
+    expect(evaluateCondition({ type: 'age', operator: 'gte', value: 18 }, state)).toBe(true)
+    expect(evaluateCondition({ type: 'age', operator: 'gte', value: 30 }, state)).toBe(false)
+  })
+
   it('combines conditions with AND', () => {
-    const state = { ...createInitialGameState(), flags: ['accepted_bribe'] }
+    const state = { ...freshState(), flags: ['accepted_bribe'] }
     const condition: Condition = {
       type: 'and',
       conditions: [
@@ -49,7 +104,7 @@ describe('evaluateCondition', () => {
   })
 
   it('combines conditions with OR', () => {
-    const state = createInitialGameState()
+    const state = freshState()
     const condition: Condition = {
       type: 'or',
       conditions: [
@@ -65,7 +120,7 @@ describe('evaluateCondition', () => {
   })
 
   it('supports nested combinators', () => {
-    const state = { ...createInitialGameState(), flags: ['helped_local_club'] }
+    const state = { ...freshState(), flags: ['helped_local_club'] }
     const condition: Condition = {
       type: 'and',
       conditions: [
@@ -82,17 +137,32 @@ describe('evaluateCondition', () => {
 
     expect(evaluateCondition(condition, state)).toBe(true)
   })
+
+  it('combines party + stat + role + flags in a single AND', () => {
+    const state = { ...freshState(), power: 40, flags: ['trusted_by_party'] }
+    const condition: Condition = {
+      type: 'and',
+      conditions: [
+        { type: 'role', operator: 'equals', value: 'puntero' },
+        { type: 'party', operator: 'equals', value: 'popular' },
+        { type: 'stat', stat: 'power', operator: 'gte', value: 30 },
+        { type: 'flag', flag: 'trusted_by_party', operator: 'exists' },
+      ],
+    }
+
+    expect(evaluateCondition(condition, state)).toBe(true)
+  })
 })
 
 describe('evaluateConditions', () => {
   it('is true when there are no conditions', () => {
-    const state = createInitialGameState()
+    const state = createInitialGameState(testParty)
 
     expect(evaluateConditions(undefined, state)).toBe(true)
   })
 
   it('delegates to evaluateCondition when conditions are present', () => {
-    const state = createInitialGameState()
+    const state = createInitialGameState(testParty)
     const condition: Condition = { type: 'role', operator: 'equals', value: 'concejal' }
 
     expect(evaluateConditions(condition, state)).toBe(false)

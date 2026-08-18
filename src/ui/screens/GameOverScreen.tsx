@@ -1,11 +1,13 @@
 import { useAtomValue, useSetAtom } from 'jotai'
+import { PARTIES } from '@/core/content/parties'
 import { Button } from '@/ui/components/ui/button'
 import { OrnamentDivider } from '@/ui/components/game/OrnamentDivider'
 import { ROLE_LABELS } from '@/ui/components/game/roleLabels'
-import { gameSessionAtom, startGameAtom } from '@/ui/state/gameSession'
+import { formatMoney } from '@/ui/components/game/statLabels'
+import { gameSessionAtom, goToPartySelectionAtom } from '@/ui/state/gameSession'
 
 const SUMMARY_STATS = [
-  { key: 'money', label: 'Dinero', format: (v: number) => `$${v}` },
+  { key: 'money', label: 'Dinero', format: formatMoney },
   { key: 'power', label: 'Poder', format: (v: number) => `${v}` },
   { key: 'popularity', label: 'Popularidad', format: (v: number) => `${v}` },
   { key: 'corruption', label: 'Corrupción', format: (v: number) => `${v}` },
@@ -14,7 +16,7 @@ const SUMMARY_STATS = [
 
 export function GameOverScreen() {
   const session = useAtomValue(gameSessionAtom)
-  const playAgain = useSetAtom(startGameAtom)
+  const playAgain = useSetAtom(goToPartySelectionAtom)
 
   if (session.phase !== 'gameover') return null
   const { state } = session
@@ -27,6 +29,7 @@ export function GameOverScreen() {
       <h1 className="font-serif text-3xl font-bold text-primary sm:text-4xl">
         Llegaste hasta: {ROLE_LABELS[state.role]}
       </h1>
+      <p className="text-sm text-muted-foreground">{PARTIES[state.party].name}</p>
 
       <OrnamentDivider className="w-40" />
 

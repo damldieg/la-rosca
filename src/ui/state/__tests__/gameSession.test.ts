@@ -1,23 +1,61 @@
 import { createStore } from 'jotai'
 import { describe, expect, it } from 'vitest'
-import { chooseAtom, continueAtom, gameSessionAtom, startGameAtom } from '../gameSession'
+import { chooseAtom, continueAtom, gameSessionAtom, goToPartySelectionAtom, selectPartyAtom } from '../gameSession'
+
+function startGameWithParty(store: ReturnType<typeof createStore>, partyId: 'popular' | 'liberal' | 'progresista') {
+  store.set(goToPartySelectionAtom)
+  store.set(selectPartyAtom, partyId)
+}
 
 describe('gameSession store', () => {
-  it('starting a game creates a valid GameState and an initial event', () => {
+  it('going to party selection creates no GameState yet', () => {
     const store = createStore()
-    store.set(startGameAtom)
+    store.set(goToPartySelectionAtom)
+
+    expect(store.get(gameSessionAtom)).toEqual({ phase: 'selecting_party' })
+  })
+
+  it('selecting a party creates a valid GameState and an initial event', () => {
+    const store = createStore()
+    startGameWithParty(store, 'popular')
 
     const session = store.get(gameSessionAtom)
     expect(session.phase).toBe('playing')
     if (session.phase !== 'playing') throw new Error('unreachable')
     expect(session.state.age).toBe(18)
     expect(session.state.role).toBe('puntero')
+    expect(session.state.party).toBe('popular')
     expect(session.event).not.toBeNull()
+  })
+
+  it('a party cannot be selected twice in a row', () => {
+    const store = createStore()
+    startGameWithParty(store, 'popular')
+    const afterFirstSelection = store.get(gameSessionAtom)
+
+    store.set(selectPartyAtom, 'liberal') // ignored: no longer in 'selecting_party' phase
+    expect(store.get(gameSessionAtom)).toEqual(afterFirstSelection)
+  })
+
+  it('different parties start with different stats and can see different eligible events', () => {
+    const popularStore = createStore()
+    startGameWithParty(popularStore, 'popular')
+    const popularSession = popularStore.get(gameSessionAtom)
+
+    const liberalStore = createStore()
+    startGameWithParty(liberalStore, 'liberal')
+    const liberalSession = liberalStore.get(gameSessionAtom)
+
+    if (popularSession.phase !== 'playing' || liberalSession.phase !== 'playing') {
+      throw new Error('unreachable')
+    }
+    expect(popularSession.state.money).not.toBe(liberalSession.state.money)
+    expect(popularSession.state.ideology).not.toEqual(liberalSession.state.ideology)
   })
 
   it('choosing applies the decision and shows real consequences before continuing', () => {
     const store = createStore()
-    store.set(startGameAtom)
+    startGameWithParty(store, 'popular')
     const before = store.get(gameSessionAtom)
     if (before.phase !== 'playing') throw new Error('unreachable')
 
@@ -38,7 +76,7 @@ describe('gameSession store', () => {
 
   it('continuing recomputes the next eligible event', () => {
     const store = createStore()
-    store.set(startGameAtom)
+    startGameWithParty(store, 'popular')
     const playing = store.get(gameSessionAtom)
     if (playing.phase !== 'playing') throw new Error('unreachable')
 
@@ -54,7 +92,7 @@ describe('gameSession store', () => {
 
   it('a choice cannot be applied twice in a row', () => {
     const store = createStore()
-    store.set(startGameAtom)
+    startGameWithParty(store, 'popular')
     const playing = store.get(gameSessionAtom)
     if (playing.phase !== 'playing') throw new Error('unreachable')
 
@@ -67,12 +105,12 @@ describe('gameSession store', () => {
 
   it('playing again creates an independent GameState', () => {
     const store = createStore()
-    store.set(startGameAtom)
+    startGameWithParty(store, 'popular')
     const first = store.get(gameSessionAtom)
     if (first.phase !== 'playing') throw new Error('unreachable')
 
     store.set(chooseAtom, first.event.choices[0])
-    store.set(startGameAtom) // "jugar de nuevo"
+    startGameWithParty(store, 'popular') // "jugar de nuevo"
 
     const second = store.get(gameSessionAtom)
     expect(second.phase).toBe('playing')

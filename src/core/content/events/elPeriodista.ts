@@ -1,3 +1,4 @@
+import { MONEY_SCALE } from '../../domain/game/economy'
 import type { Event } from '../../domain/events/types'
 
 export const elPeriodista: Event = {
@@ -15,7 +16,7 @@ export const elPeriodista: Event = {
     {
       id: 'bribe_journalist',
       text: 'Pagarle para que no publique',
-      effects: { money: -20, impunity: 15, corruption: 5 },
+      effects: { money: -MONEY_SCALE.BRIBE_TO_JOURNALIST, impunity: 15, corruption: 5 },
       durationMonths: 1,
     },
     {

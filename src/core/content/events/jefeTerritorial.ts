@@ -9,13 +9,15 @@ export const jefeTerritorial: Event = {
     {
       id: 'pledge_loyalty',
       text: 'Jurarle lealtad',
-      effects: { structure: 10, ideologyAlignment: -5 },
+      effects: { structure: 10 },
+      ideology: { institutional: -8 },
       durationMonths: 2,
     },
     {
       id: 'refuse_orders',
       text: 'Plantarte y marcar tu propia línea',
       effects: { structure: -5, power: 5 },
+      ideology: { institutional: 5 },
       durationMonths: 2,
     },
   ],
