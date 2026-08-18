@@ -13,4 +13,4 @@ this automatically) after a new decision is confirmed.
 
 ## Confirmed decisions
 
-No decisions confirmed yet — run `juntia analyze --explain` then `juntia confirm`.
+- Vitest: agregar como devDependency. Se integra directo con vite.config.ts existente, cero config adicional, soporta TS nativamente. Estandar de facto para proyectos Vite. (architecture decision, confirmed 2026-08-18)

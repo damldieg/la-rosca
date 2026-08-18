@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "decisions": [
+    {
+      "id": "c01b303b11",
+      "type": "architecture",
+      "question": "El proyecto no tiene ningún framework de testing instalado todavía. La Fase 1 del motor de juego (GameState/Decision/applyDecision) requiere tests obligatorios. ¿Qué solución de testing debería agregarse?",
+      "context": "Stack actual: Vite 8 + React 19 + TypeScript, sin dependencias de testing. Vitest se integra directamente con la configuración de Vite existente (mínima config nueva) pero es una dependencia nueva. Alternativa: usar el runner nativo `node:test` para evitar cualquier dependencia nueva, a costa de perder la integración directa con la config de Vite/TS del proyecto.",
+      "options": [
+        "vitest (dependencia nueva, cero config adicional, se integra con vite.config.ts existente)",
+        "node:test nativo de Node (sin dependencia nueva, requiere ejecutar TS compilado o vía loader)"
+      ],
+      "evidence": [],
+      "reason": "new_dependency trigger (.juntia/governance/rules/decision-triggers.md): agregar una dependencia nueva requiere confirmación humana antes de implementar.",
+      "text": "Vitest: agregar como devDependency. Se integra directo con vite.config.ts existente, cero config adicional, soporta TS nativamente. Estandar de facto para proyectos Vite.",
+      "source": "human",
+      "confirmedAt": "2026-08-18T15:22:23.263Z",
+      "status": "active"
+    }
+  ]
+}
