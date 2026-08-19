@@ -12,6 +12,10 @@ export const elSindicato: Event = {
     ],
   },
   chainId: 'sindicalista',
+  // A more anti-institutional/populist bent makes grassroots union action more likely.
+  weightModifiers: [
+    { conditions: { type: 'ideology', axis: 'institutional', operator: 'lte', value: -20 }, modifier: 10 },
+  ],
   choices: [
     {
       id: 'liderar_movilizacion',

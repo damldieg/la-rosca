@@ -19,6 +19,12 @@ export const elFinancista: Event = {
       { type: 'party', operator: 'equals', value: 'liberal' },
     ],
   },
+  weightModifiers: [
+    // A player already leaning pro-market draws this offer more often.
+    { conditions: { type: 'ideology', axis: 'economic', operator: 'gte', value: 30 }, modifier: 10 },
+    // A concejal is a bigger prize for the fund than a rank-and-file puntero.
+    { conditions: { type: 'role', operator: 'equals', value: 'concejal' }, modifier: 5 },
+  ],
   choices: [
     {
       id: 'aceptar_financiamiento',

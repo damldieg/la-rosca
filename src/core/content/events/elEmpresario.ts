@@ -7,6 +7,8 @@ export const elEmpresario: Event = {
   description: 'Un empresario de la zona te ofrece financiar tu carrera a cambio de favores futuros.',
   conditions: { type: 'role', operator: 'equals', value: 'puntero' },
   chainId: 'empresario',
+  // A market-friendly party makes the businessman's approach feel more natural.
+  weightModifiers: [{ conditions: { type: 'party', operator: 'equals', value: 'liberal' }, modifier: 8 }],
   choices: [
     {
       id: 'accept_partnership',

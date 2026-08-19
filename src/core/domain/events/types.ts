@@ -82,6 +82,16 @@ export interface EventChoice extends Omit<Decision, 'id'> {
 }
 
 /**
+ * A contextual adjustment to an event's base weight: when `conditions` holds
+ * against the current GameState, `modifier` is added to the weight (can be
+ * negative). Reuses Condition rather than a parallel condition system.
+ */
+export interface WeightModifier {
+  conditions: Condition
+  modifier: number
+}
+
+/**
  * How an event's own past occurrences affect its future eligibility, on top of
  * (never instead of) its `conditions`. Defaults to `oneShot` when omitted, so
  * every event authored before this field existed keeps its original behavior.
@@ -101,5 +111,14 @@ export interface Event {
   lifecycle?: EventLifecycle
   /** Purely descriptive grouping for authoring/UI — never read by eligibility logic. */
   chainId?: string
+  /**
+   * Base weight for weighted selection among eligible events. Defaults to
+   * DEFAULT_EVENT_WEIGHT (see eventWeight.ts) when omitted. A negative value
+   * is treated as 0 rather than rejected. 0 means "never picked on its own" —
+   * weightModifiers can still raise it above 0 for the right context.
+   */
+  weight?: number
+  /** Contextual adjustments layered on top of `weight` — see WeightModifier. */
+  weightModifiers?: WeightModifier[]
   choices: EventChoice[]
 }

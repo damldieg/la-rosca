@@ -36,10 +36,11 @@ import { laVeeduriaCiudadana } from './laVeeduriaCiudadana'
 import { losMedios } from './losMedios'
 
 /**
- * Order matters: selectEvent is deterministic and takes the first eligible event,
- * so build-up events (including the party-specific/chain ones) must precede the
- * promotion events that would otherwise move the player out of their role and
- * make the earlier ones permanently ineligible.
+ * Grouped for readability only — selectEvent is a weighted random pick, so
+ * array order no longer decides which eligible event is chosen (see
+ * eventSelector.ts). It only ever mattered because a promotion event, once
+ * selected, moves the player out of the role that made earlier build-up
+ * events eligible in the first place.
  */
 export const defaultEventPool: EventPool = [
   // --- puntero: build-up, shared ---

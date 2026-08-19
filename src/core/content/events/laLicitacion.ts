@@ -13,6 +13,12 @@ export const laLicitacion: Event = {
     ],
   },
   chainId: 'empresario',
+  weightModifiers: [
+    // A more established concejal gets offered bigger contracts.
+    { conditions: { type: 'stat', stat: 'power', operator: 'gte', value: 20 }, modifier: 8 },
+    // A closer relationship with the businessman makes the ask more pressing.
+    { conditions: { type: 'relationship', target: 'empresario', operator: 'gte', value: 30 }, modifier: 6 },
+  ],
   choices: [
     {
       id: 'favor_empresario',

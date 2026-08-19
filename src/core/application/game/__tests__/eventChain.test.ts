@@ -17,6 +17,7 @@ import { laLicitacion } from '../../../content/events/laLicitacion'
 import { laOportunidad } from '../../../content/events/laOportunidad'
 import { laTraicion } from '../../../content/events/laTraicion'
 import { getEligibleEvents } from '../../../domain/events/eventPool'
+import { FixedRandomSource } from '../../../domain/random/randomSource'
 import { chooseEvent } from '../chooseEvent'
 import { getNextEvent } from '../getNextEvent'
 import { startGame } from '../startGame'
@@ -33,7 +34,8 @@ describe('event chain: el empresario -> la licitación', () => {
 
     const eligible = getEligibleEvents(defaultEventPool, state)
     expect(eligible.map((e) => e.id)).toContain('la_licitacion')
-    expect(getNextEvent(state)).toEqual(laLicitacion)
+    // roll 0 always lands on the first eligible event in pool order (see eventSelector.ts)
+    expect(getNextEvent(state, new FixedRandomSource(0))).toEqual(laLicitacion)
   })
 
   it('stays blocked if the player rejected the businessman', () => {
@@ -47,15 +49,15 @@ describe('event chain: el empresario -> la licitación', () => {
 
     const eligible = getEligibleEvents(defaultEventPool, state)
     expect(eligible.map((e) => e.id)).not.toContain('la_licitacion')
-    expect(getNextEvent(state)).toEqual(elDebateMunicipal)
+    expect(getNextEvent(state, new FixedRandomSource(0))).toEqual(elDebateMunicipal)
   })
 })
 
 describe('getNextEvent', () => {
-  it('returns a deterministic first eligible event for a fresh game', () => {
+  it('picks the first eligible event in pool order when the random roll is 0', () => {
     const state = startGame('popular')
 
-    expect(getNextEvent(state)).toEqual(clubDelBarrio)
+    expect(getNextEvent(state, new FixedRandomSource(0))).toEqual(clubDelBarrio)
   })
 })
 

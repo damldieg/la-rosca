@@ -9,17 +9,54 @@ import { laDiputacion } from '../../../content/events/laDiputacion'
 import { getEligibleEvents } from '../../../domain/events/eventPool'
 import type { GameState } from '../../../domain/game/types/gameState'
 import type { PartyId } from '../../../domain/party/types'
+import { FixedRandomSource, SeededRandomSource } from '../../../domain/random/randomSource'
 import { chooseEvent } from '../chooseEvent'
 import { getNextEvent } from '../getNextEvent'
 import { startGame } from '../startGame'
 
-/** Plays a full deterministic run always taking the first offered choice. */
+/**
+ * Plays under real weighted randomness (a seeded, reproducible RandomSource),
+ * always taking the choice that advances the "el_jefe_politico -> la_interna ->
+ * la_traicion -> el_ascenso" loyalty chain when it's offered, and choices[0]
+ * otherwise. Used to confirm the milestone floor (see eventWeight.ts) actually
+ * keeps a critical chain reachable once randomness picks which normal events
+ * appear along the way, not just which choices are made.
+ */
+function playLoyalPathWithSeed(seed: number): GameState {
+  const loyalChoiceId: Record<string, string> = {
+    el_jefe_politico: 'jurar_lealtad_al_jefe',
+    la_interna: 'disciplinarte_a_la_lista_oficial',
+    la_traicion: 'mantenerte_leal',
+  }
+
+  let state = startGame('popular')
+  const random = new SeededRandomSource(seed)
+
+  for (let guard = 0; guard < 200; guard++) {
+    const event = getNextEvent(state, random)
+    if (!event) break
+    const preferredId = loyalChoiceId[event.id]
+    const choice = event.choices.find((c) => c.id === preferredId) ?? event.choices[0]
+    state = chooseEvent(state, event, choice)
+  }
+
+  return state
+}
+
+/**
+ * Plays a full deterministic run always taking the first offered choice, and
+ * always the first eligible event in pool order (roll 0 — see eventSelector.ts).
+ * Deterministic on purpose: this test asserts a specific expected path exists,
+ * not what weighted selection's distribution looks like (see eventSelector.test.ts
+ * for that).
+ */
 function playToTheEnd(partyId: PartyId): { state: GameState; eventIds: string[] } {
   let state = startGame(partyId)
+  const random = new FixedRandomSource(0)
   const eventIds: string[] = []
 
   for (let guard = 0; guard < 50; guard++) {
-    const event = getNextEvent(state)
+    const event = getNextEvent(state, random)
     if (!event) break
     eventIds.push(event.id)
     state = chooseEvent(state, event, event.choices[0])
@@ -93,6 +130,30 @@ describe('a full playthrough differs by party', () => {
       const { state } = playToTheEnd(partyId)
       expect(getNextEvent(state)).toBeNull()
     }
+  })
+})
+
+describe('weighted selection keeps the el_ascenso milestone chain reachable', () => {
+  it('a loyal path reaches senador via el_ascenso across many independently seeded playthroughs', () => {
+    const seeds = Array.from({ length: 25 }, (_, i) => i + 1)
+    const reachedSenador = seeds.filter((seed) => {
+      const state = playLoyalPathWithSeed(seed)
+      return ['senador', 'gobernador', 'ministro', 'presidente'].includes(state.role)
+    })
+
+    // Not 25/25: normal-weight events can still occasionally consume enough
+    // of a run's guard budget that the chain doesn't fully resolve. The
+    // milestone floor's job is to make it reliable, not literally guaranteed
+    // on every seed.
+    expect(reachedSenador.length).toBeGreaterThanOrEqual(20)
+  })
+
+  it('is itself reproducible: the same seed always reaches the same outcome', () => {
+    const first = playLoyalPathWithSeed(3)
+    const second = playLoyalPathWithSeed(3)
+
+    expect(second.role).toBe(first.role)
+    expect(second.history).toEqual(first.history)
   })
 })
 
