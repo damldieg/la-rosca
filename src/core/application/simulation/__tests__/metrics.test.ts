@@ -2,11 +2,14 @@ import { describe, expect, it } from 'vitest'
 import type { SimulationResult } from '../types'
 import {
   ageAtRoleAnalysis,
+  averageAgeAtPathChange,
   careerDistribution,
   careerMilestoneAnalysis,
   careerPathChangeAnalysis,
   careerPathDistribution,
   careerPathOutcomeAnalysis,
+  careerPathRetentionRate,
+  careerPathTransitionCount,
   deadCareerPaths,
   deadEvents,
   dominantEvents,
@@ -16,6 +19,8 @@ import {
   relationshipAnalysis,
   replayabilityAnalysis,
   resourceAnalysis,
+  roleAtPathChangeAnalysis,
+  targetPathSuccessRate,
 } from '../metrics'
 
 function fixture(overrides: Partial<SimulationResult> = {}): SimulationResult {
@@ -282,5 +287,106 @@ describe('careerPathChangeAnalysis (Fase 8)', () => {
     expect(analysis.gamesWithAnyChange).toBe(1)
     expect(analysis.changeRate).toBeCloseTo(1 / 3)
     expect(analysis.averageChangesPerGame).toBeCloseTo(1 / 3)
+  })
+})
+
+describe('careerPathTransitionCount (Fase 9)', () => {
+  it('sums every careerPathHistory entry after the first, across the whole batch', () => {
+    const results = [
+      fixture({ careerPathHistory: [{ careerPath: 'territorial', age: 18, gameDate: { years: 0, months: 0 } }] }),
+      fixture({
+        careerPathHistory: [
+          { careerPath: 'territorial', age: 18, gameDate: { years: 0, months: 0 } },
+          { careerPath: 'tecnica', age: 20, gameDate: { years: 2, months: 0 } },
+          { careerPath: 'institucional', age: 24, gameDate: { years: 6, months: 0 } },
+        ],
+      }),
+      fixture({ careerPathHistory: [] }),
+    ]
+
+    expect(careerPathTransitionCount(results)).toBe(2)
+  })
+})
+
+describe('averageAgeAtPathChange (Fase 9)', () => {
+  it('averages the age of every change, ignoring the initial pick', () => {
+    const results = [
+      fixture({
+        careerPathHistory: [
+          { careerPath: 'territorial', age: 18, gameDate: { years: 0, months: 0 } },
+          { careerPath: 'tecnica', age: 22, gameDate: { years: 4, months: 0 } },
+        ],
+      }),
+      fixture({
+        careerPathHistory: [
+          { careerPath: 'sindical', age: 18, gameDate: { years: 0, months: 0 } },
+          { careerPath: 'institucional', age: 30, gameDate: { years: 12, months: 0 } },
+        ],
+      }),
+    ]
+
+    expect(averageAgeAtPathChange(results)).toBeCloseTo(26)
+  })
+
+  it('is 0 when no game ever changed careerPath', () => {
+    const results = [fixture({ careerPathHistory: [{ careerPath: 'territorial', age: 18, gameDate: { years: 0, months: 0 } }] })]
+    expect(averageAgeAtPathChange(results)).toBe(0)
+  })
+})
+
+describe('careerPathRetentionRate (Fase 9)', () => {
+  it('is the fraction of games starting on a path that also ended on it, per path', () => {
+    const results = [
+      fixture({ careerPath: 'territorial', careerPathHistory: [{ careerPath: 'territorial', age: 18, gameDate: { years: 0, months: 0 } }] }),
+      fixture({
+        careerPath: 'tecnica',
+        careerPathHistory: [
+          { careerPath: 'territorial', age: 18, gameDate: { years: 0, months: 0 } },
+          { careerPath: 'tecnica', age: 20, gameDate: { years: 2, months: 0 } },
+        ],
+      }),
+      fixture({ careerPath: 'sindical', careerPathHistory: [{ careerPath: 'sindical', age: 18, gameDate: { years: 0, months: 0 } }] }),
+    ]
+
+    const rates = careerPathRetentionRate(results)
+    expect(rates.territorial).toBeCloseTo(0.5) // 2 started territorial, 1 kept it
+    expect(rates.sindical).toBe(1)
+    expect(rates.tecnica).toBeUndefined() // nobody started on tecnica
+  })
+})
+
+describe('targetPathSuccessRate (Fase 9 §13/§14)', () => {
+  it('is the fraction of games that ended on the given target path', () => {
+    const results = [
+      fixture({ careerPath: 'tecnica' }),
+      fixture({ careerPath: 'tecnica' }),
+      fixture({ careerPath: 'empresarial' }),
+    ]
+
+    expect(targetPathSuccessRate(results, 'tecnica')).toBeCloseTo(2 / 3)
+    expect(targetPathSuccessRate(results, 'sindical')).toBe(0)
+  })
+})
+
+describe('roleAtPathChangeAnalysis (Fase 9)', () => {
+  it('derives the role held at each careerPath change by joining on gameDate, with no new state field', () => {
+    const results = [
+      fixture({
+        roleHistory: [
+          { role: 'militante', age: 18, gameDate: { years: 0, months: 0 } },
+          { role: 'puntero', age: 19, gameDate: { years: 1, months: 0 } },
+          { role: 'asesor', age: 20, gameDate: { years: 2, months: 0 } },
+        ],
+        careerPathHistory: [
+          { careerPath: 'territorial', age: 18, gameDate: { years: 0, months: 0 } },
+          // this change happens exactly when the asesor promotion does (Fase 9's own el_asesor_politico)
+          { careerPath: 'tecnica', age: 20, gameDate: { years: 2, months: 0 } },
+        ],
+      }),
+    ]
+
+    const analysis = roleAtPathChangeAnalysis(results)
+    expect(analysis.asesor).toEqual({ count: 1, percentage: 100 })
+    expect(analysis.militante).toBeUndefined()
   })
 })

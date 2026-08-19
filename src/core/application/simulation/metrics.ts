@@ -1,4 +1,4 @@
-import type { CareerPathId, Role } from '../../domain/game/types/gameState'
+import type { CareerPathId, GameDate, Role } from '../../domain/game/types/gameState'
 import type { PartyId } from '../../domain/party/types'
 import type { SimulationResult } from './types'
 
@@ -305,4 +305,78 @@ export function careerPathChangeAnalysis(results: SimulationResult[]): CareerPat
     changeRate: results.length > 0 ? gamesWithAnyChange / results.length : 0,
     averageChangesPerGame: average(changesPerGame),
   }
+}
+
+/** Total number of careerPath changes (careerPathHistory entries after the first) across the whole batch — Fase 9 §15. */
+export function careerPathTransitionCount(results: SimulationResult[]): number {
+  return results.reduce((sum, r) => sum + Math.max(0, r.careerPathHistory.length - 1), 0)
+}
+
+/** Mean age at which an actual careerPath change (not the initial pick) happened, across the whole batch — Fase 9 §15. */
+export function averageAgeAtPathChange(results: SimulationResult[]): number {
+  const ages = results.flatMap((r) => r.careerPathHistory.slice(1).map((entry) => entry.age))
+  return average(ages)
+}
+
+/**
+ * Per-path: of the games that started on this path (careerPathHistory[0]),
+ * what fraction still had it as their final careerPath — Fase 9 §15. A path
+ * absent from the result (no game ever started on it) is omitted rather than
+ * reported as 0, same convention as ageAtRoleAnalysis.
+ */
+export function careerPathRetentionRate(results: SimulationResult[]): Partial<Record<CareerPathId, number>> {
+  const rates: Partial<Record<CareerPathId, number>> = {}
+  for (const path of ALL_CAREER_PATHS) {
+    const startedOnPath = results.filter((r) => r.careerPathHistory[0]?.careerPath === path)
+    if (startedOnPath.length === 0) continue
+    const retained = startedOnPath.filter((r) => r.careerPath === path).length
+    rates[path] = retained / startedOnPath.length
+  }
+  return rates
+}
+
+/**
+ * Fraction of games that ended on `targetCareerPath` — meaningful only for a
+ * batch run with a career-focused DecisionPolicy actually targeting that path
+ * (Fase 9 §13/§15); the target itself isn't stored on SimulationResult, so
+ * the caller supplies it (it already knows, since it chose the policy).
+ */
+export function targetPathSuccessRate(results: SimulationResult[], targetCareerPath: CareerPathId): number {
+  return results.length > 0 ? results.filter((r) => r.careerPath === targetCareerPath).length / results.length : 0
+}
+
+function gameDateToMonths(date: GameDate): number {
+  return date.years * 12 + date.months
+}
+
+/**
+ * Role distribution at the moment each careerPath change happened, derived by
+ * joining careerPathHistory against roleHistory on gameDate (both already
+ * exist — Fase 9 §7 explicitly prefers this over duplicating role onto
+ * CareerPathHistoryEntry). Denominator is total transitions, not total games.
+ */
+export function roleAtPathChangeAnalysis(results: SimulationResult[]): CareerDistribution {
+  const distribution: CareerDistribution = {}
+  let total = 0
+
+  for (const result of results) {
+    for (const change of result.careerPathHistory.slice(1)) {
+      const changeMonths = gameDateToMonths(change.gameDate)
+      let roleAtChange: Role | undefined
+      for (const entry of result.roleHistory) {
+        if (gameDateToMonths(entry.gameDate) <= changeMonths) roleAtChange = entry.role
+        else break
+      }
+      if (roleAtChange === undefined) continue
+
+      const entry = (distribution[roleAtChange] ??= { count: 0, percentage: 0 })
+      entry.count += 1
+      total += 1
+    }
+  }
+
+  for (const entry of Object.values(distribution)) {
+    if (entry) entry.percentage = total > 0 ? (entry.count / total) * 100 : 0
+  }
+  return distribution
 }

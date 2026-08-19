@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { defaultEventPool } from '../../../content/events'
 import { clubDelBarrio } from '../../../content/events/clubDelBarrio'
+import { elAsesorPolitico } from '../../../content/events/elAsesorPolitico'
+import { elCandidatoTecnico } from '../../../content/events/elCandidatoTecnico'
+import { elDirigenteMediatico } from '../../../content/events/elDirigenteMediatico'
 import { elFinancista } from '../../../content/events/elFinancista'
 import { elLlamadoNacional } from '../../../content/events/elLlamadoNacional'
+import { elLobbyista } from '../../../content/events/elLobbyista'
 import { elReferente } from '../../../content/events/elReferente'
 import { elSindicato } from '../../../content/events/elSindicato'
 import { laAsesoria } from '../../../content/events/laAsesoria'
@@ -396,5 +400,60 @@ describe('careerPath: set by la_orientacion_politica, never a rigid class (Fase 
     expect(territorialWeight).toBeGreaterThan(sindicalWeight)
     // Still eligible either way — careerPath only weights, it never gates (spec §9).
     expect(getEligibleEvents(defaultEventPool, sindical).map((e) => e.id)).toContain('la_consolidacion_territorial')
+  })
+})
+
+describe('Fase 9: strategic career agency', () => {
+  it('changing careerPath does not change role, unless the choice itself says so', () => {
+    // el_dirigente_mediatico's accept choice only sets careerPath, no role field at all.
+    const state: GameState = { ...startGame('popular'), role: 'diputado' as const, careerPath: 'mediatica' }
+    const pivoted = chooseEvent(state, elDirigenteMediatico, elDirigenteMediatico.choices[0])
+
+    expect(pivoted.careerPath).toBe('sindical')
+    expect(pivoted.role).toBe('diputado') // unchanged
+  })
+
+  it('changing careerPath does not erase relationships the choice never mentions', () => {
+    const state: GameState = {
+      ...startGame('popular'),
+      role: 'diputado' as const,
+      careerPath: 'mediatica',
+      relationships: { periodista: 40, jefePartidario: 12 },
+    }
+    // el_dirigente_mediatico's accept choice touches sindicalista/periodista, never jefePartidario.
+    const pivoted = chooseEvent(state, elDirigenteMediatico, elDirigenteMediatico.choices[0])
+
+    expect(pivoted.relationships.jefePartidario).toBe(12)
+  })
+
+  it('careerPath can change more than once in the same game', () => {
+    const state: GameState = { ...startGame('popular'), role: 'puntero' as const, careerPath: 'territorial' }
+
+    const first = chooseEvent(state, elAsesorPolitico, elAsesorPolitico.choices[0])
+    expect(first.careerPath).toBe('tecnica')
+    expect(first.role).toBe('asesor')
+
+    const second = chooseEvent(first, elCandidatoTecnico, elCandidatoTecnico.choices[0])
+    expect(second.careerPath).toBe('institucional')
+
+    expect(second.careerPathHistory.map((e) => e.careerPath)).toEqual(['tecnica', 'institucional'])
+  })
+
+  it('a party nudges a pivot event\'s weight upward without ever making it ineligible for another party', () => {
+    const liberalTecnico: GameState = { ...startGame('liberal'), role: 'asesor' as const, careerPath: 'tecnica' }
+    const popularTecnico: GameState = { ...liberalTecnico, party: 'popular' as const }
+
+    expect(calculateEventWeight(elLobbyista, liberalTecnico)).toBeGreaterThan(calculateEventWeight(elLobbyista, popularTecnico))
+    expect(getEligibleEvents(defaultEventPool, popularTecnico).map((e) => e.id)).toContain('el_lobbyista')
+  })
+
+  it('every careerPath can transition to at least one other via a valid decision (no dead ends, Fase 9 §10/§11)', () => {
+    const ALL: GameState['careerPath'][] = ['territorial', 'tecnica', 'empresarial', 'sindical', 'mediatica', 'institucional']
+    for (const path of ALL) {
+      const state: GameState = { ...startGame('popular'), role: 'diputado' as const, careerPath: path }
+      const eligible = getEligibleEvents(defaultEventPool, state)
+      const canPivot = eligible.some((event) => event.choices.some((choice) => choice.careerPath !== undefined && choice.careerPath !== path))
+      expect(canPivot).toBe(true)
+    }
   })
 })

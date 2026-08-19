@@ -1,6 +1,7 @@
 import type { EventPool } from '../../domain/events/eventPool'
 import { clubDelBarrio } from './clubDelBarrio'
 import { elAcuerdoSindical } from './elAcuerdoSindical'
+import { elAnalistaPolitico } from './elAnalistaPolitico'
 import { elArchivoOAvance } from './elArchivoOAvance'
 import { elAscenso } from './elAscenso'
 import { elAsesorPolitico } from './elAsesorPolitico'
@@ -28,11 +29,13 @@ import { elInformeTecnico } from './elInformeTecnico'
 import { elJefePolitico } from './elJefePolitico'
 import { elLlamadoNacional } from './elLlamadoNacional'
 import { elLobbyEmpresarial } from './elLobbyEmpresarial'
+import { elLobbyista } from './elLobbyista'
 import { elNegocioConjunto } from './elNegocioConjunto'
 import { elOperadorDeConfianza } from './elOperadorDeConfianza'
 import { elOrganismoDeControl } from './elOrganismoDeControl'
 import { elPactoDeGobernabilidad } from './elPactoDeGobernabilidad'
 import { elParoGeneral } from './elParoGeneral'
+import { elPaseSindical } from './elPaseSindical'
 import { elPeriodista } from './elPeriodista'
 import { elPerfilTecnico } from './elPerfilTecnico'
 import { elPrestigioAcademico } from './elPrestigioAcademico'
@@ -40,6 +43,7 @@ import { elReconocimientoPublico } from './elReconocimientoPublico'
 import { elReferente } from './elReferente'
 import { elRivalInterno } from './elRivalInterno'
 import { elSindicato } from './elSindicato'
+import { elVoceroDelBloque } from './elVoceroDelBloque'
 import { jefeTerritorial } from './jefeTerritorial'
 import { laAsesoria } from './laAsesoria'
 import { laAuditoriaDeContratos } from './laAuditoriaDeContratos'
@@ -51,7 +55,10 @@ import { laCampanaDeImagen } from './laCampanaDeImagen'
 import { laCandidaturaAlSenado } from './laCandidaturaAlSenado'
 import { laCoherenciaCuestionada } from './laCoherenciaCuestionada'
 import { laColumnaDeOpinion } from './laColumnaDeOpinion'
+import { laComisionDeTrabajo } from './laComisionDeTrabajo'
+import { laConsolidacionInstitucional } from './laConsolidacionInstitucional'
 import { laConsolidacionTerritorial } from './laConsolidacionTerritorial'
+import { laConstruccionDeEstructura } from './laConstruccionDeEstructura'
 import { laCriticaSinRespaldo } from './laCriticaSinRespaldo'
 import { laCrisisTerritorial } from './laCrisisTerritorial'
 import { laDenuncia } from './laDenuncia'
@@ -84,6 +91,7 @@ import { laPerdidaDeFinanciacion } from './laPerdidaDeFinanciacion'
 import { laPerdidaDeLaCandidatura } from './laPerdidaDeLaCandidatura'
 import { laPresidencia } from './laPresidencia'
 import { laPrimeraMilitancia } from './laPrimeraMilitancia'
+import { laProfesionalizacion } from './laProfesionalizacion'
 import { laRedDeContactos } from './laRedDeContactos'
 import { laReformaDeGestion } from './laReformaDeGestion'
 import { laReformaLegislativa } from './laReformaLegislativa'
@@ -193,6 +201,15 @@ export const defaultEventPool: EventPool = [
   elAsesorPolitico,
   elDirigenteMediatico,
   elCandidatoTecnico,
+  // --- career identity: path pivots (Fase 9 — strategic career agency) ---
+  elPaseSindical,
+  laProfesionalizacion,
+  laComisionDeTrabajo,
+  elAnalistaPolitico,
+  elLobbyista,
+  laConsolidacionInstitucional,
+  elVoceroDelBloque,
+  laConstruccionDeEstructura,
   // --- career identity: territorial path ---
   laUnidadBasica,
   laMovilizacionTerritorial,

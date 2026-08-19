@@ -4,7 +4,9 @@ import type { PoliticalParty } from '../../../domain/party/types'
 import { SeededRandomSource } from '../../../domain/random/randomSource'
 import type { Event } from '../../../domain/events/types'
 import {
+  careerFocusedDecisionPolicies,
   corruptDecisionPolicy,
+  createCareerFocusedPolicy,
   institutionalDecisionPolicy,
   popularDecisionPolicy,
   randomDecisionPolicy,
@@ -69,5 +71,53 @@ describe('institutionalDecisionPolicy', () => {
   it('prefers the choice with the biggest institutional/relationship payoff', () => {
     const choice = institutionalDecisionPolicy(event, freshState(), new SeededRandomSource(1))
     expect(choice.id).toBe('institutional')
+  })
+})
+
+describe('careerFocusedDecisionPolicy (Fase 9 §13, simulation-only)', () => {
+  const pivotEvent: Event = {
+    id: 'pivot_event',
+    title: '',
+    description: '',
+    choices: [
+      { id: 'go_tecnica', text: '', careerPath: 'tecnica', effects: { power: 1 } },
+      { id: 'go_empresarial', text: '', careerPath: 'empresarial', effects: { power: 50 } },
+      { id: 'stay', text: '', effects: { popularity: 10 } },
+    ],
+  }
+
+  it('always picks the choice that sets careerPath to the target, even when another choice scores higher on raw effects', () => {
+    const policy = createCareerFocusedPolicy('tecnica')
+    const choice = policy(pivotEvent, freshState(), new SeededRandomSource(1))
+    expect(choice.id).toBe('go_tecnica')
+  })
+
+  it('never picks a choice that pivots to a different careerPath than the target', () => {
+    const policy = createCareerFocusedPolicy('tecnica')
+    for (let seed = 1; seed <= 20; seed++) {
+      const choice = policy(pivotEvent, freshState(), new SeededRandomSource(seed))
+      expect(choice.id).not.toBe('go_empresarial')
+    }
+  })
+
+  it('falls back to the mild effects-based preference among choices that do not touch careerPath', () => {
+    const noPivotEvent: Event = {
+      id: 'no_pivot',
+      title: '',
+      description: '',
+      choices: [
+        { id: 'low', text: '', effects: { power: 1 } },
+        { id: 'high', text: '', effects: { power: 10, popularity: 10 } },
+      ],
+    }
+    const policy = createCareerFocusedPolicy('tecnica')
+    const choice = policy(noPivotEvent, freshState(), new SeededRandomSource(1))
+    expect(choice.id).toBe('high')
+  })
+
+  it('ships one ready-made policy per careerPath', () => {
+    expect(Object.keys(careerFocusedDecisionPolicies).sort()).toEqual(
+      ['empresarial', 'institucional', 'mediatica', 'sindical', 'tecnica', 'territorial'].sort(),
+    )
   })
 })

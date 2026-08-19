@@ -1,11 +1,15 @@
 import { PARTIES } from '../../content/parties'
+import type { CareerPathId } from '../../domain/game/types/gameState'
 import {
   ageAtRoleAnalysis,
+  averageAgeAtPathChange,
   careerDistribution,
   careerMilestoneAnalysis,
   careerPathChangeAnalysis,
   careerPathDistribution,
   careerPathOutcomeAnalysis,
+  careerPathRetentionRate,
+  careerPathTransitionCount,
   deadCareerPaths,
   deadEvents,
   dominantEvents,
@@ -16,6 +20,8 @@ import {
   relationshipAnalysis,
   replayabilityAnalysis,
   resourceAnalysis,
+  roleAtPathChangeAnalysis,
+  targetPathSuccessRate,
 } from './metrics'
 import type { SimulationResult } from './types'
 
@@ -91,16 +97,28 @@ export function generateReport(results: SimulationResult[]): string {
   const deadPaths = deadCareerPaths(results)
   const outcomesByPath = careerPathOutcomeAnalysis(results)
   const pathChanges = careerPathChangeAnalysis(results)
+  const retentionByPath = careerPathRetentionRate(results)
+  const roleAtChange = roleAtPathChangeAnalysis(results)
   lines.push(
     '## Career paths',
     '',
     deadPaths.length === 0
       ? '- no dead career paths (every chosen path reached at least puntero somewhere)'
       : `- dead career paths (chosen but never left militante/referente): ${deadPaths.join(', ')}`,
+    `- total careerPath transitions: ${careerPathTransitionCount(results)}`,
     `- games with at least one careerPath change: ${pathChanges.gamesWithAnyChange} (${pct(pathChanges.changeRate)}), avg ${pathChanges.averageChangesPerGame.toFixed(2)} changes/game`,
+    `- average age at a careerPath change: ${averageAgeAtPathChange(results).toFixed(1)}`,
     '',
-    '### Outcomes by career path (final role distribution, Fase 8)',
+    '### Retention rate (started on path X, still on X at the end)',
   )
+  for (const [path, rate] of Object.entries(retentionByPath)) {
+    if (rate !== undefined) lines.push(`- ${path}: ${pct(rate)}`)
+  }
+  lines.push('', '### Role held at the moment of a careerPath change')
+  for (const [role, count] of Object.entries(roleAtChange)) {
+    if (count) lines.push(`- ${role}: ${count.count} (${count.percentage.toFixed(1)}%)`)
+  }
+  lines.push('', '### Outcomes by career path (final role distribution, Fase 8)')
   for (const [path, distribution] of Object.entries(outcomesByPath)) {
     if (!distribution) continue
     lines.push(`- **${path}**:`)
@@ -131,6 +149,46 @@ export function generateReport(results: SimulationResult[]): string {
   for (const [id, summary] of Object.entries(relationships)) {
     lines.push(`- ${id}: ${summary.mean.toFixed(1)} / ${summary.min} / ${summary.max}`)
   }
+
+  return lines.join('\n')
+}
+
+/**
+ * Summary for one directed batch (Fase 9 §14) — every game run with the same
+ * career-focused DecisionPolicy targeting `targetCareerPath`. Answers "if the
+ * player deliberately wants this path, can they actually build it": success
+ * rate, retention vs. drift, and where a drifted game ended up instead.
+ */
+export function generateTargetedReport(results: SimulationResult[], targetCareerPath: CareerPathId): string {
+  const lines: string[] = []
+  const successRate = targetPathSuccessRate(results, targetCareerPath)
+  const distribution = careerPathDistribution(results)
+  const outcomes = careerPathOutcomeAnalysis(results)[targetCareerPath] ?? {}
+  const milestones = careerMilestoneAnalysis(results.filter((r) => r.careerPath === targetCareerPath))
+
+  lines.push(
+    `### Target: ${targetCareerPath} (${results.length} games)`,
+    '',
+    `- success rate (ended on ${targetCareerPath}): ${pct(successRate)}`,
+    `- average age at a careerPath change: ${averageAgeAtPathChange(results).toFixed(1)}`,
+    '',
+    '#### Final careerPath distribution (drift, if any)',
+  )
+  for (const [path, count] of Object.entries(distribution)) {
+    if (count) lines.push(`- ${path}: ${count.count} (${count.percentage.toFixed(1)}%)`)
+  }
+  lines.push('', `#### Final role, among games that stayed on ${targetCareerPath}`)
+  for (const [role, count] of Object.entries(outcomes)) {
+    if (count) lines.push(`- ${role}: ${count.count} (${count.percentage.toFixed(1)}%)`)
+  }
+  lines.push(
+    '',
+    `#### Milestones, among games that stayed on ${targetCareerPath}`,
+    `- Senador+: ${pct(milestones.rate.senadorOrAbove)}`,
+    `- Ministro+: ${pct(milestones.rate.ministroOrAbove)}`,
+    `- Presidente: ${pct(milestones.rate.presidente)}`,
+    '',
+  )
 
   return lines.join('\n')
 }

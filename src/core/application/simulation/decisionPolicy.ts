@@ -1,4 +1,5 @@
 import type { EventChoice } from '../../domain/events/types'
+import type { CareerPathId } from '../../domain/game/types/gameState'
 import type { DecisionPolicy } from './types'
 
 /**
@@ -63,3 +64,33 @@ export const decisionPolicies: Record<string, DecisionPolicy> = {
   popular: popularDecisionPolicy,
   institutional: institutionalDecisionPolicy,
 }
+
+const ALL_CAREER_PATHS: CareerPathId[] = ['territorial', 'tecnica', 'empresarial', 'sindical', 'mediatica', 'institucional']
+
+/**
+ * Simulation-only (Fase 9 §13): scores a choice by whether it moves the
+ * player toward `targetCareerPath` — a choice that sets it wins outright, one
+ * that sets a *different* path loses outright, and among choices that don't
+ * touch careerPath at all it falls back to a mild power/popularity/structure
+ * preference so the playthrough still makes reasonable progress. This exists
+ * purely to answer "can this path be built deliberately if that's the whole
+ * goal" — the real game never uses a DecisionPolicy at all, since a human
+ * player picks their own EventChoice directly.
+ */
+function careerFocusedScorer(targetCareerPath: CareerPathId): ChoiceScorer {
+  return (choice) => {
+    if (choice.careerPath === targetCareerPath) return 1000
+    if (choice.careerPath !== undefined) return -1000
+    const effects = choice.effects ?? {}
+    return (effects.power ?? 0) + (effects.popularity ?? 0) + (effects.structure ?? 0) * 0.5
+  }
+}
+
+export function createCareerFocusedPolicy(targetCareerPath: CareerPathId): DecisionPolicy {
+  return scoredPolicy(careerFocusedScorer(targetCareerPath))
+}
+
+/** One ready-made career-focused policy per path, for directed simulation batches (Fase 9 §14). */
+export const careerFocusedDecisionPolicies: Record<CareerPathId, DecisionPolicy> = Object.fromEntries(
+  ALL_CAREER_PATHS.map((path) => [path, createCareerFocusedPolicy(path)]),
+) as Record<CareerPathId, DecisionPolicy>
