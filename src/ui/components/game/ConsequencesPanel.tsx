@@ -11,6 +11,7 @@ const DELTA_KEYS = Object.keys({
   corruption: 0,
   impunity: 0,
   structure: 0,
+  exposure: 0,
 } satisfies Record<keyof DecisionEffects, number>) as (keyof DecisionEffects)[]
 
 const IDEOLOGY_AXES = Object.keys({

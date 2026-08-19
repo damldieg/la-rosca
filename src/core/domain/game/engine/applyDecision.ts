@@ -3,7 +3,7 @@ import type { GameState, Ideology } from '../types/gameState'
 import { clamp } from './clamp'
 import { advanceTime } from './time'
 
-const BOUNDED_STAT_KEYS = ['power', 'popularity', 'corruption', 'impunity', 'structure'] as const
+const BOUNDED_STAT_KEYS = ['power', 'popularity', 'corruption', 'impunity', 'structure', 'exposure'] as const
 
 export function applyDecision(state: GameState, decision: Decision): GameState {
   const effects = decision.effects ?? {}

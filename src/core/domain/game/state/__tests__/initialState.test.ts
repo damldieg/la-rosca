@@ -20,6 +20,7 @@ describe('createInitialGameState', () => {
     expect(state.age).toBe(18)
     expect(state.date).toEqual({ years: 18, months: 0 })
     expect(state.role).toBe('puntero')
+    expect(state.exposure).toBe(0) // unknown politician, not yet on anyone's radar
     expect(state.flags).toEqual([])
     expect(state.relationships).toEqual({})
     expect(state.history).toEqual([])

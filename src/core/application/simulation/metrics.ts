@@ -68,6 +68,7 @@ export interface ResourceAnalysis {
   popularity: ResourceSummary
   corruption: ResourceSummary
   structure: ResourceSummary
+  exposure: ResourceSummary
 }
 
 export function resourceAnalysis(results: SimulationResult[]): ResourceAnalysis {
@@ -77,7 +78,15 @@ export function resourceAnalysis(results: SimulationResult[]): ResourceAnalysis 
     popularity: summarize(results.map((r) => r.popularity)),
     corruption: summarize(results.map((r) => r.corruption)),
     structure: summarize(results.map((r) => r.structure)),
+    exposure: summarize(results.map((r) => r.exposure)),
   }
+}
+
+/** Political-fall event ids introduced in Fase 7 — counts how many games saw at least one. */
+const POLITICAL_FALL_EVENT_IDS = ['la_caida_ministerial', 'la_caida_gubernamental', 'la_perdida_de_la_candidatura']
+
+export function politicalFallCount(results: SimulationResult[]): number {
+  return results.filter((r) => r.eventsVisited.some((id) => POLITICAL_FALL_EVENT_IDS.includes(id))).length
 }
 
 export interface EventStat {

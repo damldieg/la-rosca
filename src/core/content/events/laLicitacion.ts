@@ -24,7 +24,7 @@ export const laLicitacion: Event = {
       id: 'favor_empresario',
       text: 'Favorecer a tu socio en la licitación',
       addFlags: ['accepted_bribe'],
-      effects: { money: MONEY_SCALE.RIGGED_BID_PAYOUT, corruption: 15, impunity: -10 },
+      effects: { money: MONEY_SCALE.RIGGED_BID_PAYOUT, corruption: 15, impunity: -10, exposure: 10 },
       relationships: { empresario: 15 },
       durationMonths: 4,
     },

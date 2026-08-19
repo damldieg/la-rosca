@@ -19,7 +19,7 @@ export const elNegocioConjunto: Event = {
     {
       id: 'asociarte_formalmente',
       text: 'Asociarte formalmente al negocio del empresario',
-      effects: { money: MONEY_SCALE.JOINT_VENTURE_RETURN, corruption: 5 },
+      effects: { money: MONEY_SCALE.JOINT_VENTURE_RETURN, corruption: 5, exposure: 5 },
       relationships: { empresario: 15 },
       durationMonths: 3,
     },

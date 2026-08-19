@@ -28,6 +28,7 @@ export interface SimulationResult {
   corruption: number
   impunity: number
   structure: number
+  exposure: number
   ideology: Ideology
   relationships: Record<RelationshipId, number>
   historyLength: number

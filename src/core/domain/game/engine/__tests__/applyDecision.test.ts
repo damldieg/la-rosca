@@ -48,6 +48,19 @@ describe('applyDecision', () => {
     expect(underMin.power).toBe(0)
   })
 
+  it('modifies exposure and keeps it within 0-100, like the other bounded stats (Fase 7)', () => {
+    const state = freshState()
+
+    const investigated = applyDecision(state, { id: 'exposed', effects: { exposure: 30 } })
+    expect(investigated.exposure).toBe(30)
+
+    const overMax = applyDecision(state, { id: 'huge_exposure', effects: { exposure: 1000 } })
+    expect(overMax.exposure).toBe(100)
+
+    const underMin = applyDecision(investigated, { id: 'huge_coverup', effects: { exposure: -1000 } })
+    expect(underMin.exposure).toBe(0)
+  })
+
   it('keeps relationships within -100/+100', () => {
     const state = freshState()
 

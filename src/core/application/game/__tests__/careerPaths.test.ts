@@ -128,11 +128,24 @@ describe('a full playthrough differs by party', () => {
     expect(popular.state.role).not.toBe(liberal.state.role)
   })
 
-  it('every playthrough terminates once the eligible pool is exhausted', () => {
+  it('every playthrough terminates once the eligible pool is exhausted, even a permanently corrupt one', () => {
     for (const partyId of ['popular', 'liberal', 'progresista'] as const) {
       const { state } = playToTheEnd(partyId)
       expect(getNextEvent(state)).toBeNull()
     }
+  })
+
+  it('a corrupt career keeps facing el_barometro_de_opinion for as long as it stays exposed, but managing exposure down eventually ends the cycle', () => {
+    // The popular deterministic path racks up real corruption (stays >= 20
+    // for the rest of the game) but always answers el_barometro_de_opinion
+    // with "responder_con_datos" (exposure -3 each time), so exposure
+    // eventually drops below the event's own exposure >= 10 floor and the
+    // pool finally empties — corruption alone isn't a life sentence, staying
+    // exposed is (see elBarometroDeOpinion.ts).
+    const { state } = playToTheEnd('popular')
+
+    expect(state.corruption).toBeGreaterThanOrEqual(20)
+    expect(state.exposure).toBeLessThan(10)
   })
 })
 

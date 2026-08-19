@@ -4,6 +4,7 @@ import { fiscal } from './fiscal'
 import { jefePartidario } from './jefePartidario'
 import { organizacionCivil } from './organizacionCivil'
 import { periodista } from './periodista'
+import { rivalInterno } from './rivalInterno'
 import { sindicalista } from './sindicalista'
 
 export const ACTORS: Record<string, Actor> = {
@@ -13,6 +14,7 @@ export const ACTORS: Record<string, Actor> = {
   jefePartidario,
   fiscal,
   organizacionCivil,
+  rivalInterno,
 }
 
-export const actorList: Actor[] = [empresario, sindicalista, periodista, jefePartidario, fiscal, organizacionCivil]
+export const actorList: Actor[] = [empresario, sindicalista, periodista, jefePartidario, fiscal, organizacionCivil, rivalInterno]

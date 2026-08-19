@@ -7,6 +7,7 @@ import {
   dominantEvents,
   durationSummary,
   eventStats,
+  politicalFallCount,
   relationshipAnalysis,
   replayabilityAnalysis,
   resourceAnalysis,
@@ -26,6 +27,7 @@ function fixture(overrides: Partial<SimulationResult> = {}): SimulationResult {
     corruption: 0,
     impunity: 0,
     structure: 10,
+    exposure: 0,
     ideology: { economic: 0, social: 0, institutional: 0 },
     relationships: {},
     historyLength: 3,
@@ -72,6 +74,18 @@ describe('resourceAnalysis', () => {
     const analysis = resourceAnalysis(results)
 
     expect(analysis.money).toEqual({ mean: 200, min: 100, max: 300 })
+  })
+})
+
+describe('politicalFallCount', () => {
+  it('counts games that visited at least one political-fall event (Fase 7)', () => {
+    const results = [
+      fixture({ eventsVisited: ['la_caida_ministerial'] }),
+      fixture({ eventsVisited: ['x', 'la_caida_gubernamental', 'y'] }),
+      fixture({ eventsVisited: ['x', 'y'] }),
+    ]
+
+    expect(politicalFallCount(results)).toBe(2)
   })
 })
 

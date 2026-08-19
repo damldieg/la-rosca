@@ -40,6 +40,15 @@ export interface DecisionEffects {
   corruption?: number
   impunity?: number
   structure?: number
+  /**
+   * How vulnerable the player currently is to consequences for their actions
+   * (visibility, evidence, enemies, public attention) — separate from
+   * `corruption`, which is how much they've actually done. A politician can
+   * be highly corrupt but well-insulated (low exposure), or fairly clean but
+   * under intense scrutiny (high exposure). See eventWeight.ts and the
+   * el_investigacion_periodistica family of events for how it's used.
+   */
+  exposure?: number
 }
 
 export interface HistoryEntry {
@@ -60,6 +69,7 @@ export interface GameState {
   corruption: number
   impunity: number
   structure: number
+  exposure: number
   flags: string[]
   relationships: Record<RelationshipId, number>
   history: HistoryEntry[]

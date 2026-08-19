@@ -2,6 +2,8 @@ import type { EventPool } from '../../domain/events/eventPool'
 import { clubDelBarrio } from './clubDelBarrio'
 import { elArchivoOAvance } from './elArchivoOAvance'
 import { elAscenso } from './elAscenso'
+import { elBarometroDeOpinion } from './elBarometroDeOpinion'
+import { elCostoPolitico } from './elCostoPolitico'
 import { elDebateMunicipal } from './elDebateMunicipal'
 import { elDesenlaceEmpresario } from './elDesenlaceEmpresario'
 import { elEmpresario } from './elEmpresario'
@@ -9,34 +11,49 @@ import { elFavorSindical } from './elFavorSindical'
 import { elFinancista } from './elFinancista'
 import { elFiscal } from './elFiscal'
 import { elGabinete } from './elGabinete'
+import { elIndultoPolitico } from './elIndultoPolitico'
 import { elJefePolitico } from './elJefePolitico'
 import { elLlamadoNacional } from './elLlamadoNacional'
 import { elNegocioConjunto } from './elNegocioConjunto'
 import { elOperadorDeConfianza } from './elOperadorDeConfianza'
+import { elPactoDeGobernabilidad } from './elPactoDeGobernabilidad'
 import { elPeriodista } from './elPeriodista'
 import { elPerfilTecnico } from './elPerfilTecnico'
 import { elPrestigioAcademico } from './elPrestigioAcademico'
 import { elReconocimientoPublico } from './elReconocimientoPublico'
+import { elRivalInterno } from './elRivalInterno'
 import { elSindicato } from './elSindicato'
 import { jefeTerritorial } from './jefeTerritorial'
 import { laAsesoria } from './laAsesoria'
+import { laAuditoriaDeContratos } from './laAuditoriaDeContratos'
+import { laCaidaGubernamental } from './laCaidaGubernamental'
+import { laCaidaMinisterial } from './laCaidaMinisterial'
 import { laCampana } from './laCampana'
+import { laCoherenciaCuestionada } from './laCoherenciaCuestionada'
 import { laColumnaDeOpinion } from './laColumnaDeOpinion'
+import { laCrisisTerritorial } from './laCrisisTerritorial'
 import { laDenuncia } from './laDenuncia'
 import { laDiputacion } from './laDiputacion'
 import { laEntrevista } from './laEntrevista'
+import { laFiltracion } from './laFiltracion'
 import { laGobernacion } from './laGobernacion'
 import { laIntendencia } from './laIntendencia'
 import { laInterna } from './laInterna'
+import { laInternaPartidaria } from './laInternaPartidaria'
 import { laInvestigacionEmpresario } from './laInvestigacionEmpresario'
 import { laInvestigacionJudicial } from './laInvestigacionJudicial'
+import { laInvestigacionPeriodistica } from './laInvestigacionPeriodistica'
 import { laLicitacion } from './laLicitacion'
 import { laMovilizacion } from './laMovilizacion'
+import { laMulta } from './laMulta'
 import { laNegociacion } from './laNegociacion'
 import { laOperacionMediatica } from './laOperacionMediatica'
 import { laOportunidad } from './laOportunidad'
 import { laOrganizacionCivil } from './laOrganizacionCivil'
+import { laPerdidaDeFinanciacion } from './laPerdidaDeFinanciacion'
+import { laPerdidaDeLaCandidatura } from './laPerdidaDeLaCandidatura'
 import { laPresidencia } from './laPresidencia'
+import { laSupervivenciaDelEscandalo } from './laSupervivenciaDelEscandalo'
 import { laTraicion } from './laTraicion'
 import { laTransparencia } from './laTransparencia'
 import { laVeeduriaCiudadana } from './laVeeduriaCiudadana'
@@ -105,4 +122,26 @@ export const defaultEventPool: EventPool = [
   elGabinete,
   elLlamadoNacional,
   laPresidencia,
+  // --- political risk: investigation / press, and its consequences ---
+  laInvestigacionPeriodistica,
+  laSupervivenciaDelEscandalo,
+  elIndultoPolitico,
+  laCaidaMinisterial,
+  laCaidaGubernamental,
+  laPerdidaDeLaCandidatura,
+  // --- political risk: internal rival ---
+  elRivalInterno,
+  laInternaPartidaria,
+  elPactoDeGobernabilidad,
+  // --- political risk: leak ---
+  laFiltracion,
+  // --- political risk: party-specific crisis ---
+  laCrisisTerritorial,
+  laAuditoriaDeContratos,
+  laCoherenciaCuestionada,
+  // --- political risk: consequences of corruption ---
+  laMulta,
+  elCostoPolitico,
+  laPerdidaDeFinanciacion,
+  elBarometroDeOpinion,
 ]

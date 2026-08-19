@@ -14,7 +14,7 @@ export const elEmpresario: Event = {
       id: 'accept_partnership',
       text: 'Aceptar el trato',
       addFlags: ['businessman_ally'],
-      effects: { money: MONEY_SCALE.BUSINESS_FINANCING, corruption: 5 },
+      effects: { money: MONEY_SCALE.BUSINESS_FINANCING, corruption: 5, exposure: 3 },
       relationships: { empresario: 20 },
       durationMonths: 2,
     },

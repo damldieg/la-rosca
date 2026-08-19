@@ -12,6 +12,7 @@ export const BASE_INITIAL_STATS = {
   corruption: 0,
   impunity: 0,
   structure: 10,
+  exposure: 0,
 } as const
 
 export function createInitialGameState(party: PoliticalParty): GameState {

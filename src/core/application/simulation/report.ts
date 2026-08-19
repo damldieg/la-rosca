@@ -7,6 +7,7 @@ import {
   durationSummary,
   eventStats,
   groupByParty,
+  politicalFallCount,
   relationshipAnalysis,
   replayabilityAnalysis,
   resourceAnalysis,
@@ -36,6 +37,7 @@ export function generateReport(results: SimulationResult[]): string {
     const resources = resourceAnalysis(partyResults)
     const milestones = careerMilestoneAnalysis(partyResults)
     const replay = replayabilityAnalysis(partyResults)
+    const falls = politicalFallCount(partyResults)
 
     lines.push(`## ${party?.name ?? partyId} (${partyResults.length} games)`, '')
     lines.push('### Career distribution')
@@ -59,6 +61,10 @@ export function generateReport(results: SimulationResult[]): string {
       `- Popularity: ${resources.popularity.mean.toFixed(1)} / ${resources.popularity.min} / ${resources.popularity.max}`,
       `- Corruption: ${resources.corruption.mean.toFixed(1)} / ${resources.corruption.min} / ${resources.corruption.max}`,
       `- Structure: ${resources.structure.mean.toFixed(1)} / ${resources.structure.min} / ${resources.structure.max}`,
+      `- Exposure: ${resources.exposure.mean.toFixed(1)} / ${resources.exposure.min} / ${resources.exposure.max}`,
+      '',
+      '### Political risk',
+      `- Games with at least one political fall: ${falls} (${pct(falls / partyResults.length)})`,
       '',
       '### Replayability',
       `- Distinct event sequences: ${replay.distinctEventSequences}/${replay.totalGames} (${pct(replay.distinctEventSequenceRate)})`,

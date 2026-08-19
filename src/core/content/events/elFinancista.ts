@@ -29,7 +29,7 @@ export const elFinancista: Event = {
     {
       id: 'aceptar_financiamiento',
       text: 'Aceptar el financiamiento',
-      effects: { money: MONEY_SCALE.BUSINESS_FINANCING, corruption: 8, power: 3 },
+      effects: { money: MONEY_SCALE.BUSINESS_FINANCING, corruption: 8, power: 3, exposure: 5 },
       ideology: { economic: 10 },
       durationMonths: 1,
     },

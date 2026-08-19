@@ -8,6 +8,7 @@ const BOUNDED_STATS: { key: keyof GameState; label: string; barClassName: string
   { key: 'popularity', label: 'Popularidad', barClassName: '[&>[data-slot=progress-indicator]]:bg-bordeaux' },
   { key: 'corruption', label: 'Corrupción', barClassName: '[&>[data-slot=progress-indicator]]:bg-destructive' },
   { key: 'structure', label: 'Estructura', barClassName: '[&>[data-slot=progress-indicator]]:bg-olive' },
+  { key: 'exposure', label: 'Exposición', barClassName: '' },
 ]
 
 export function StatsPanel({ state }: { state: GameState }) {

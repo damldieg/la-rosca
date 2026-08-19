@@ -65,6 +65,7 @@ export function simulateGame(config: SimulationConfig): SimulationResult {
     corruption: state.corruption,
     impunity: state.impunity,
     structure: state.structure,
+    exposure: state.exposure,
     ideology: state.ideology,
     relationships: state.relationships,
     historyLength: state.history.length,

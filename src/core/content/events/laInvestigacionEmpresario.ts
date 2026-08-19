@@ -19,7 +19,7 @@ export const laInvestigacionEmpresario: Event = {
       id: 'pagar_para_tapar',
       text: 'Pagar para tapar la investigación',
       addFlags: ['bribed_investigation'],
-      effects: { money: -MONEY_SCALE.COVERUP_PAYMENT, impunity: 8 },
+      effects: { money: -MONEY_SCALE.COVERUP_PAYMENT, impunity: 8, exposure: 8 },
       relationships: { empresario: 10, fiscal: -10 },
       durationMonths: 2,
     },

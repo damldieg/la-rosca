@@ -7,6 +7,7 @@ export const STAT_LABELS: Record<keyof DecisionEffects, string> = {
   corruption: 'Corrupción',
   impunity: 'Impunidad',
   structure: 'Estructura',
+  exposure: 'Exposición',
 }
 
 export const IDEOLOGY_AXIS_LABELS: Record<keyof Ideology, string> = {
