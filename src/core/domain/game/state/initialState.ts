@@ -39,5 +39,6 @@ export function createInitialGameState(party: PoliticalParty): GameState {
     relationships: { ...(party.initialRelationships ?? {}) },
     history: [],
     roleHistory: [{ role, age: STARTING_AGE, gameDate: date }],
+    careerPathHistory: [],
   }
 }

@@ -4,7 +4,9 @@ import {
   ageAtRoleAnalysis,
   careerDistribution,
   careerMilestoneAnalysis,
+  careerPathChangeAnalysis,
   careerPathDistribution,
+  careerPathOutcomeAnalysis,
   deadCareerPaths,
   deadEvents,
   dominantEvents,
@@ -25,6 +27,7 @@ function fixture(overrides: Partial<SimulationResult> = {}): SimulationResult {
     finalAge: 20,
     careerPath: undefined,
     roleHistory: [{ role: 'militante', age: 18, gameDate: { years: 0, months: 0 } }],
+    careerPathHistory: [],
     turns: 3,
     gameOver: true,
     money: 100,
@@ -238,5 +241,46 @@ describe('deadCareerPaths (Fase 7.5)', () => {
     const results = [fixture({ careerPath: 'territorial', finalRole: 'gobernador' })]
 
     expect(deadCareerPaths(results)).not.toContain('mediatica')
+  })
+})
+
+describe('careerPathOutcomeAnalysis (Fase 8)', () => {
+  it('gives a per-path finalRole distribution, mirroring careerDistribution grouped by path', () => {
+    const results = [
+      fixture({ careerPath: 'territorial', finalRole: 'gobernador' }),
+      fixture({ careerPath: 'territorial', finalRole: 'gobernador' }),
+      fixture({ careerPath: 'territorial', finalRole: 'presidente' }),
+      fixture({ careerPath: 'tecnica', finalRole: 'ministro' }),
+    ]
+
+    const analysis = careerPathOutcomeAnalysis(results)
+    expect(analysis.territorial?.gobernador?.count).toBe(2)
+    expect(analysis.territorial?.gobernador?.percentage).toBeCloseTo(200 / 3)
+    expect(analysis.territorial?.presidente?.count).toBe(1)
+    expect(analysis.territorial?.presidente?.percentage).toBeCloseTo(100 / 3)
+    expect(analysis.tecnica?.ministro).toEqual({ count: 1, percentage: 100 })
+    expect(analysis.sindical).toBeUndefined()
+  })
+})
+
+describe('careerPathChangeAnalysis (Fase 8)', () => {
+  it('counts a change as any careerPathHistory entry after the first', () => {
+    const results = [
+      fixture({
+        careerPathHistory: [{ careerPath: 'territorial', age: 18, gameDate: { years: 0, months: 0 } }],
+      }),
+      fixture({
+        careerPathHistory: [
+          { careerPath: 'territorial', age: 18, gameDate: { years: 0, months: 0 } },
+          { careerPath: 'tecnica', age: 20, gameDate: { years: 2, months: 0 } },
+        ],
+      }),
+      fixture({ careerPathHistory: [] }), // never set a path at all
+    ]
+
+    const analysis = careerPathChangeAnalysis(results)
+    expect(analysis.gamesWithAnyChange).toBe(1)
+    expect(analysis.changeRate).toBeCloseTo(1 / 3)
+    expect(analysis.averageChangesPerGame).toBeCloseTo(1 / 3)
   })
 })

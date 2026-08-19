@@ -3,7 +3,9 @@ import {
   ageAtRoleAnalysis,
   careerDistribution,
   careerMilestoneAnalysis,
+  careerPathChangeAnalysis,
   careerPathDistribution,
+  careerPathOutcomeAnalysis,
   deadCareerPaths,
   deadEvents,
   dominantEvents,
@@ -87,14 +89,26 @@ export function generateReport(results: SimulationResult[]): string {
   }
 
   const deadPaths = deadCareerPaths(results)
+  const outcomesByPath = careerPathOutcomeAnalysis(results)
+  const pathChanges = careerPathChangeAnalysis(results)
   lines.push(
     '## Career paths',
     '',
     deadPaths.length === 0
       ? '- no dead career paths (every chosen path reached at least puntero somewhere)'
       : `- dead career paths (chosen but never left militante/referente): ${deadPaths.join(', ')}`,
+    `- games with at least one careerPath change: ${pathChanges.gamesWithAnyChange} (${pct(pathChanges.changeRate)}), avg ${pathChanges.averageChangesPerGame.toFixed(2)} changes/game`,
     '',
+    '### Outcomes by career path (final role distribution, Fase 8)',
   )
+  for (const [path, distribution] of Object.entries(outcomesByPath)) {
+    if (!distribution) continue
+    lines.push(`- **${path}**:`)
+    for (const [role, count] of Object.entries(distribution)) {
+      if (count) lines.push(`  - ${role}: ${count.count} (${count.percentage.toFixed(1)}%)`)
+    }
+  }
+  lines.push('')
 
   const stats = eventStats(results)
   const dominant = dominantEvents(stats)

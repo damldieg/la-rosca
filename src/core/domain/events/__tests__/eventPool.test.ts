@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createInitialGameState } from '../../game/state/initialState'
 import type { PoliticalParty } from '../../party/types'
-import { getEligibleEvents } from '../eventPool'
+import { getEligibleEvents, withEligibleChoices } from '../eventPool'
 import type { Event } from '../types'
 
 const testParty: PoliticalParty = {
@@ -149,5 +149,62 @@ describe('getEligibleEvents', () => {
 
     expect(getEligibleEvents([adultEvent], young)).toEqual([])
     expect(getEligibleEvents([adultEvent], older)).toEqual([adultEvent])
+  })
+
+  describe('withEligibleChoices (Fase 8)', () => {
+    const pathSplitEvent: Event = {
+      id: 'path_split_event',
+      title: 'Path split event',
+      description: '',
+      choices: [
+        { id: 'territorial_choice', text: 't', conditions: { type: 'careerPath', operator: 'equals', value: 'territorial' } },
+        { id: 'tecnica_choice', text: 'x', conditions: { type: 'careerPath', operator: 'equals', value: 'tecnica' } },
+        { id: 'fallback_choice', text: 'f' },
+      ],
+    }
+
+    it('drops a choice whose conditions do not hold, keeping the unconditioned fallback', () => {
+      const territorial = { ...freshState(), careerPath: 'territorial' as const }
+      const filtered = withEligibleChoices(pathSplitEvent, territorial)
+
+      expect(filtered.choices.map((c) => c.id)).toEqual(['territorial_choice', 'fallback_choice'])
+    })
+
+    it('keeps a choice whose conditions hold', () => {
+      const tecnica = { ...freshState(), careerPath: 'tecnica' as const }
+      const filtered = withEligibleChoices(pathSplitEvent, tecnica)
+
+      expect(filtered.choices.map((c) => c.id)).toEqual(['tecnica_choice', 'fallback_choice'])
+    })
+
+    it('returns the original event unchanged when nothing was filtered out', () => {
+      const unconditioned = punteroEvent // single choice, no per-choice conditions
+      const state = freshState()
+
+      expect(withEligibleChoices(unconditioned, state)).toBe(unconditioned)
+    })
+
+    it('falls back to keeping every choice if filtering would otherwise leave none — never an empty choice list', () => {
+      const allConditioned: Event = {
+        id: 'all_conditioned_event',
+        title: 'All conditioned event',
+        description: '',
+        choices: [
+          { id: 'a', text: 'a', conditions: { type: 'careerPath', operator: 'equals', value: 'territorial' } },
+          { id: 'b', text: 'b', conditions: { type: 'careerPath', operator: 'equals', value: 'tecnica' } },
+        ],
+      }
+      const noPathYet = freshState() // careerPath undefined — matches neither choice
+
+      const filtered = withEligibleChoices(allConditioned, noPathYet)
+      expect(filtered.choices).toHaveLength(2)
+    })
+
+    it('getEligibleEvents applies choice filtering to every eligible event it returns', () => {
+      const territorial = { ...freshState(), careerPath: 'territorial' as const }
+      const [eligible] = getEligibleEvents([pathSplitEvent], territorial)
+
+      expect(eligible.choices.map((c) => c.id)).toEqual(['territorial_choice', 'fallback_choice'])
+    })
   })
 })

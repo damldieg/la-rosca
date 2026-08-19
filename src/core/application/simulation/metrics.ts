@@ -267,3 +267,42 @@ export function deadCareerPaths(results: SimulationResult[]): CareerPathId[] {
     return withPath.every((r) => PRE_CAREER_ROLES.includes(r.finalRole))
   })
 }
+
+/**
+ * finalRole distribution among games that ended on each careerPath (Fase 8) —
+ * reuses careerDistribution's exact shape/logic, just pre-grouped by path.
+ * Answers the spec's own example: "Territorial: Gobernador: X%, Presidente: X%".
+ */
+export type CareerPathOutcomeAnalysis = Partial<Record<CareerPathId, CareerDistribution>>
+
+export function careerPathOutcomeAnalysis(results: SimulationResult[]): CareerPathOutcomeAnalysis {
+  const analysis: CareerPathOutcomeAnalysis = {}
+  for (const path of ALL_CAREER_PATHS) {
+    const withPath = results.filter((r) => r.careerPath === path)
+    if (withPath.length > 0) analysis[path] = careerDistribution(withPath)
+  }
+  return analysis
+}
+
+export interface CareerPathChangeAnalysis {
+  gamesWithAnyChange: number
+  changeRate: number
+  averageChangesPerGame: number
+}
+
+/**
+ * A "change" is any careerPathHistory entry after the first (the first is
+ * always the initial la_orientacion_politica pick, not a change) — Fase 8's
+ * "no rigid class" principle should be visible in real playthroughs, not just
+ * in principle.
+ */
+export function careerPathChangeAnalysis(results: SimulationResult[]): CareerPathChangeAnalysis {
+  const changesPerGame = results.map((r) => Math.max(0, r.careerPathHistory.length - 1))
+  const gamesWithAnyChange = changesPerGame.filter((changes) => changes > 0).length
+
+  return {
+    gamesWithAnyChange,
+    changeRate: results.length > 0 ? gamesWithAnyChange / results.length : 0,
+    averageChangesPerGame: average(changesPerGame),
+  }
+}

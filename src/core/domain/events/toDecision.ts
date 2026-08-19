@@ -5,7 +5,7 @@ import type { Event, EventChoice } from './types'
 const DECISION_ID_SEPARATOR = ':'
 
 export function choiceToDecision(event: Event, choice: EventChoice): Decision {
-  const { id, text: _text, ...effects } = choice
+  const { id, text: _text, conditions: _conditions, ...effects } = choice
   return { id: `${event.id}${DECISION_ID_SEPARATOR}${id}`, ...effects }
 }
 

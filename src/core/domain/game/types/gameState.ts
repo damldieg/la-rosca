@@ -15,10 +15,12 @@ export type Role =
 
 /**
  * Which trajectory a career is following — territory, technocracy, business,
- * unions, media, or institutions. Descriptive/weighting metadata, not a rigid
- * class: it never gates an event on its own, only nudges weights and flavors
- * narrative (see WeightModifier usage in content). Set by la_orientacion_politica,
- * unset until then.
+ * unions, media, or institutions. Never a rigid class: it can change over a
+ * playthrough (see CareerPathHistoryEntry) and never blocks a career outright.
+ * Set by la_orientacion_politica, unset until then. Shapes identity three ways
+ * (Fase 8): nudges event weights (WeightModifier), gates a handful of
+ * path-flavored events outright (Condition), and — for a few shared events —
+ * changes which choices are even offered (EventChoice.conditions).
  */
 export type CareerPathId = 'territorial' | 'tecnica' | 'empresarial' | 'sindical' | 'mediatica' | 'institucional'
 
@@ -81,6 +83,13 @@ export interface RoleHistoryEntry {
   gameDate: GameDate
 }
 
+/** One entry per actual careerPath change (Fase 8) — mirrors RoleHistoryEntry exactly; see applyDecision.ts. */
+export interface CareerPathHistoryEntry {
+  careerPath: CareerPathId
+  age: number
+  gameDate: GameDate
+}
+
 export interface GameState {
   /** Character age in years — see GameDate's own doc comment for how this differs from `date`. */
   age: number
@@ -100,4 +109,5 @@ export interface GameState {
   relationships: Record<RelationshipId, number>
   history: HistoryEntry[]
   roleHistory: RoleHistoryEntry[]
+  careerPathHistory: CareerPathHistoryEntry[]
 }

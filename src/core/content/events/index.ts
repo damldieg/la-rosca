@@ -1,22 +1,38 @@
 import type { EventPool } from '../../domain/events/eventPool'
 import { clubDelBarrio } from './clubDelBarrio'
+import { elAcuerdoSindical } from './elAcuerdoSindical'
 import { elArchivoOAvance } from './elArchivoOAvance'
 import { elAscenso } from './elAscenso'
+import { elAsesorPolitico } from './elAsesorPolitico'
 import { elBarometroDeOpinion } from './elBarometroDeOpinion'
+import { elCandidatoTecnico } from './elCandidatoTecnico'
+import { elConflictoDeIntereses } from './elConflictoDeIntereses'
+import { elContratoPrivado } from './elContratoPrivado'
 import { elCostoPolitico } from './elCostoPolitico'
 import { elDebateMunicipal } from './elDebateMunicipal'
+import { elDebateTelevisivo } from './elDebateTelevisivo'
 import { elDesenlaceEmpresario } from './elDesenlaceEmpresario'
+import { elDirigenteMediatico } from './elDirigenteMediatico'
 import { elEmpresario } from './elEmpresario'
+import { elEmpresarioQuiereAyudarte } from './elEmpresarioQuiereAyudarte'
+import { elEquipoTecnico } from './elEquipoTecnico'
+import { elEscandaloMediatico } from './elEscandaloMediatico'
+import { elFavorDelBarrio } from './elFavorDelBarrio'
 import { elFavorSindical } from './elFavorSindical'
 import { elFinancista } from './elFinancista'
 import { elFiscal } from './elFiscal'
 import { elGabinete } from './elGabinete'
 import { elIndultoPolitico } from './elIndultoPolitico'
+import { elInformeDeTransparencia } from './elInformeDeTransparencia'
+import { elInformeTecnico } from './elInformeTecnico'
 import { elJefePolitico } from './elJefePolitico'
 import { elLlamadoNacional } from './elLlamadoNacional'
+import { elLobbyEmpresarial } from './elLobbyEmpresarial'
 import { elNegocioConjunto } from './elNegocioConjunto'
 import { elOperadorDeConfianza } from './elOperadorDeConfianza'
+import { elOrganismoDeControl } from './elOrganismoDeControl'
 import { elPactoDeGobernabilidad } from './elPactoDeGobernabilidad'
+import { elParoGeneral } from './elParoGeneral'
 import { elPeriodista } from './elPeriodista'
 import { elPerfilTecnico } from './elPerfilTecnico'
 import { elPrestigioAcademico } from './elPrestigioAcademico'
@@ -27,29 +43,39 @@ import { elSindicato } from './elSindicato'
 import { jefeTerritorial } from './jefeTerritorial'
 import { laAsesoria } from './laAsesoria'
 import { laAuditoriaDeContratos } from './laAuditoriaDeContratos'
+import { laAuditoriaInstitucional } from './laAuditoriaInstitucional'
 import { laCaidaGubernamental } from './laCaidaGubernamental'
 import { laCaidaMinisterial } from './laCaidaMinisterial'
 import { laCampana } from './laCampana'
+import { laCampanaDeImagen } from './laCampanaDeImagen'
 import { laCandidaturaAlSenado } from './laCandidaturaAlSenado'
 import { laCoherenciaCuestionada } from './laCoherenciaCuestionada'
 import { laColumnaDeOpinion } from './laColumnaDeOpinion'
 import { laConsolidacionTerritorial } from './laConsolidacionTerritorial'
+import { laCriticaSinRespaldo } from './laCriticaSinRespaldo'
 import { laCrisisTerritorial } from './laCrisisTerritorial'
 import { laDenuncia } from './laDenuncia'
 import { laDiputacion } from './laDiputacion'
 import { laEntrevista } from './laEntrevista'
+import { laEntrevistaExclusiva } from './laEntrevistaExclusiva'
 import { laFiltracion } from './laFiltracion'
 import { laGobernacion } from './laGobernacion'
 import { laIntendencia } from './laIntendencia'
 import { laInterna } from './laInterna'
 import { laInternaPartidaria } from './laInternaPartidaria'
+import { laInternaSindical } from './laInternaSindical'
+import { laInternaTerritorial } from './laInternaTerritorial'
 import { laInvestigacionEmpresario } from './laInvestigacionEmpresario'
 import { laInvestigacionJudicial } from './laInvestigacionJudicial'
 import { laInvestigacionPeriodistica } from './laInvestigacionPeriodistica'
 import { laLicitacion } from './laLicitacion'
 import { laMovilizacion } from './laMovilizacion'
+import { laMovilizacionTerritorial } from './laMovilizacionTerritorial'
 import { laMulta } from './laMulta'
 import { laNegociacion } from './laNegociacion'
+import { laNegociacionColectiva } from './laNegociacionColectiva'
+import { laNegociacionPrivada } from './laNegociacionPrivada'
+import { laOfertaDeFinanciamiento } from './laOfertaDeFinanciamiento'
 import { laOperacionMediatica } from './laOperacionMediatica'
 import { laOportunidad } from './laOportunidad'
 import { laOrganizacionCivil } from './laOrganizacionCivil'
@@ -59,9 +85,12 @@ import { laPerdidaDeLaCandidatura } from './laPerdidaDeLaCandidatura'
 import { laPresidencia } from './laPresidencia'
 import { laPrimeraMilitancia } from './laPrimeraMilitancia'
 import { laRedDeContactos } from './laRedDeContactos'
+import { laReformaDeGestion } from './laReformaDeGestion'
+import { laReformaLegislativa } from './laReformaLegislativa'
 import { laSupervivenciaDelEscandalo } from './laSupervivenciaDelEscandalo'
 import { laTraicion } from './laTraicion'
 import { laTransparencia } from './laTransparencia'
+import { laUnidadBasica } from './laUnidadBasica'
 import { laVeeduriaCiudadana } from './laVeeduriaCiudadana'
 import { losMedios } from './losMedios'
 
@@ -157,4 +186,41 @@ export const defaultEventPool: EventPool = [
   elCostoPolitico,
   laPerdidaDeFinanciacion,
   elBarometroDeOpinion,
+  // --- career identity (Fase 8): shared, path-dependent-choice events ---
+  laOfertaDeFinanciamiento,
+  elEmpresarioQuiereAyudarte,
+  // --- career identity: path pivots (careerPath is never a rigid class) ---
+  elAsesorPolitico,
+  elDirigenteMediatico,
+  elCandidatoTecnico,
+  // --- career identity: territorial path ---
+  laUnidadBasica,
+  laMovilizacionTerritorial,
+  laInternaTerritorial,
+  elFavorDelBarrio,
+  // --- career identity: tecnica path ---
+  elInformeTecnico,
+  laReformaLegislativa,
+  elEquipoTecnico,
+  laCriticaSinRespaldo,
+  // --- career identity: empresarial path ---
+  elLobbyEmpresarial,
+  elContratoPrivado,
+  laNegociacionPrivada,
+  elConflictoDeIntereses,
+  // --- career identity: sindical path ---
+  laNegociacionColectiva,
+  elParoGeneral,
+  elAcuerdoSindical,
+  laInternaSindical,
+  // --- career identity: mediatica path ---
+  laEntrevistaExclusiva,
+  elDebateTelevisivo,
+  laCampanaDeImagen,
+  elEscandaloMediatico,
+  // --- career identity: institucional path ---
+  elInformeDeTransparencia,
+  laAuditoriaInstitucional,
+  elOrganismoDeControl,
+  laReformaDeGestion,
 ]

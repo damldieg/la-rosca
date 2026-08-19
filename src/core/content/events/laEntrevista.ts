@@ -6,6 +6,7 @@ export const laEntrevista: Event = {
   description: 'Un periodista de la zona te pide una entrevista para conocerte mejor.',
   conditions: { type: 'role', operator: 'equals', value: 'concejal' },
   chainId: 'periodista',
+  weightModifiers: [{ conditions: { type: 'careerPath', operator: 'equals', value: 'mediatica' }, modifier: 15 }],
   choices: [
     {
       id: 'dar_la_entrevista',

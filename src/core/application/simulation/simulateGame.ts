@@ -61,6 +61,7 @@ export function simulateGame(config: SimulationConfig): SimulationResult {
     finalAge: state.age,
     careerPath: state.careerPath,
     roleHistory: state.roleHistory,
+    careerPathHistory: state.careerPathHistory,
     turns,
     gameOver,
     money: state.money,

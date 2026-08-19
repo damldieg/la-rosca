@@ -86,6 +86,14 @@ export interface OrCondition {
 export interface EventChoice extends Omit<Decision, 'id'> {
   id: string
   text: string
+  /**
+   * When present, this choice only appears when it holds against the current
+   * GameState (Fase 8) — lets one event offer different choices per
+   * careerPath/role/etc. without a parallel system. Omitted (the default)
+   * means always eligible, same as every event authored before this existed.
+   * Filtered by eventPool.ts's withEligibleChoices, not read by applyDecision.
+   */
+  conditions?: Condition
 }
 
 /**

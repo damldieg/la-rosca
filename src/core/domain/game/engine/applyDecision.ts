@@ -46,6 +46,10 @@ export function applyDecision(state: GameState, decision: Decision): GameState {
 
   const roleHistory =
     role !== state.role ? [...state.roleHistory, { role, age, gameDate: date }] : state.roleHistory
+  const careerPathHistory =
+    careerPath !== undefined && careerPath !== state.careerPath
+      ? [...state.careerPathHistory, { careerPath, age, gameDate: date }]
+      : state.careerPathHistory
 
   return {
     ...state,
@@ -60,5 +64,6 @@ export function applyDecision(state: GameState, decision: Decision): GameState {
     age,
     history,
     roleHistory,
+    careerPathHistory,
   }
 }

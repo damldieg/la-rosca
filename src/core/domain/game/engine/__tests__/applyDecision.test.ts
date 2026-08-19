@@ -156,6 +156,27 @@ describe('applyDecision', () => {
     ])
   })
 
+  it('appends to careerPathHistory only when careerPath is set and actually changes (Fase 8)', () => {
+    const state = freshState()
+    expect(state.careerPathHistory).toEqual([])
+
+    const unchanged = applyDecision(state, { id: 'no_orientation', durationMonths: 2 })
+    expect(unchanged.careerPathHistory).toEqual([])
+
+    const oriented = applyDecision(unchanged, { id: 'orientation', careerPath: 'territorial', durationMonths: 1 })
+    expect(oriented.careerPathHistory).toEqual([{ careerPath: 'territorial', age: 18, gameDate: { years: 0, months: 3 } }])
+
+    // setting the same careerPath again is not a change
+    const same = applyDecision(oriented, { id: 'reaffirm', careerPath: 'territorial', durationMonths: 1 })
+    expect(same.careerPathHistory).toHaveLength(1)
+
+    const pivoted = applyDecision(same, { id: 'pivot', careerPath: 'tecnica', durationMonths: 14 })
+    expect(pivoted.careerPathHistory).toEqual([
+      { careerPath: 'territorial', age: 18, gameDate: { years: 0, months: 3 } },
+      { careerPath: 'tecnica', age: 19, gameDate: { years: 1, months: 6 } },
+    ])
+  })
+
   it('registers the decision in history', () => {
     const state = freshState()
     const newState = applyDecision(state, {

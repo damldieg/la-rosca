@@ -45,4 +45,25 @@ describe('choiceToDecision', () => {
     expect(newState.popularity).toBe(state.popularity + 5)
     expect(newState.history[0].decisionId).toBe('club_del_barrio:help_club')
   })
+
+  it('does not leak a per-choice conditions field into the resulting Decision (Fase 8)', () => {
+    const pathSplitEvent: Event = {
+      id: 'path_split_event',
+      title: 'Path split event',
+      description: '',
+      choices: [
+        {
+          id: 'territorial_choice',
+          text: 't',
+          conditions: { type: 'careerPath', operator: 'equals', value: 'territorial' },
+          effects: { power: 1 },
+        },
+      ],
+    }
+
+    const decision = choiceToDecision(pathSplitEvent, pathSplitEvent.choices[0])
+
+    expect(decision).toEqual({ id: 'path_split_event:territorial_choice', effects: { power: 1 } })
+    expect(decision).not.toHaveProperty('conditions')
+  })
 })

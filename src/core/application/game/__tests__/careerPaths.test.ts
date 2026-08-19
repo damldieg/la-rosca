@@ -75,7 +75,9 @@ function playToTheEnd(partyId: PartyId): { state: GameState; eventIds: string[] 
   const random = new FixedRandomSource(0)
   const eventIds: string[] = []
 
-  for (let guard = 0; guard < 50; guard++) {
+  // Fase 8's own territorial-path content pushed the popular party's deterministic
+  // path past the old guard of 50 (now needs ~52) before the pool exhausts.
+  for (let guard = 0; guard < 100; guard++) {
     const event = getNextEvent(state, random)
     if (!event) break
     eventIds.push(event.id)

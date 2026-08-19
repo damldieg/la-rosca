@@ -1,5 +1,13 @@
 import type { Event, EventChoice } from '../../domain/events/types'
-import type { CareerPathId, GameState, Ideology, RelationshipId, Role, RoleHistoryEntry } from '../../domain/game/types/gameState'
+import type {
+  CareerPathHistoryEntry,
+  CareerPathId,
+  GameState,
+  Ideology,
+  RelationshipId,
+  Role,
+  RoleHistoryEntry,
+} from '../../domain/game/types/gameState'
 import type { PartyId } from '../../domain/party/types'
 import type { RandomSource } from '../../domain/random/randomSource'
 
@@ -22,6 +30,7 @@ export interface SimulationResult {
   finalAge: number
   careerPath: CareerPathId | undefined
   roleHistory: RoleHistoryEntry[]
+  careerPathHistory: CareerPathHistoryEntry[]
   turns: number
   /** True when the event pool was exhausted (natural end); false when maxTurns cut the run short. */
   gameOver: boolean
