@@ -2,12 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { defaultEventPool } from '../../../content/events'
 import { clubDelBarrio } from '../../../content/events/clubDelBarrio'
 import { elFinancista } from '../../../content/events/elFinancista'
+import { elLlamadoNacional } from '../../../content/events/elLlamadoNacional'
 import { elSindicato } from '../../../content/events/elSindicato'
 import { laAsesoria } from '../../../content/events/laAsesoria'
 import { laCampana } from '../../../content/events/laCampana'
 import { laDiputacion } from '../../../content/events/laDiputacion'
 import { getEligibleEvents } from '../../../domain/events/eventPool'
-import type { GameState } from '../../../domain/game/types/gameState'
+import type { GameState, Role } from '../../../domain/game/types/gameState'
 import type { PartyId } from '../../../domain/party/types'
 import { FixedRandomSource, SeededRandomSource } from '../../../domain/random/randomSource'
 import { chooseEvent } from '../chooseEvent'
@@ -120,8 +121,10 @@ describe('a full playthrough differs by party', () => {
     expect(onlyLiberal).toContain(elFinancista.id)
     expect(onlyLiberal).toContain(laAsesoria.id)
 
-    expect(popular.state.role).toBe('gobernador') // territorial branch
-    expect(liberal.state.role).toBe('diputado') // asesor branch
+    // Territorial branch: intendente -> gobernador -> el_llamado_nacional -> ministro -> presidente
+    // (gobernador is no longer a dead end — see elLlamadoNacional.ts).
+    expect(popular.state.role).toBe('presidente')
+    expect(liberal.state.role).toBe('diputado') // asesor branch — still a dead end, out of this fix's scope
     expect(popular.state.role).not.toBe(liberal.state.role)
   })
 
@@ -188,6 +191,54 @@ describe('career reaches senador/ministro/presidente only through events, never 
 
     expect(getEligibleEvents(defaultEventPool, young).map((e) => e.id)).toContain('el_gabinete')
     expect(getEligibleEvents(defaultEventPool, old).map((e) => e.id)).toContain('el_gabinete')
+  })
+})
+
+describe('gobernador is no longer a career dead end (Fase 6.75)', () => {
+  it('a gobernador with enough power can access el_llamado_nacional, the twin of el_gabinete', () => {
+    const gobernadorReady = { ...startGame('popular'), role: 'gobernador' as const, power: 55 }
+    expect(getEligibleEvents(defaultEventPool, gobernadorReady).map((e) => e.id)).toContain('el_llamado_nacional')
+  })
+
+  it('stays blocked below the power threshold, exactly like el_gabinete', () => {
+    const gobernadorNotReady = { ...startGame('popular'), role: 'gobernador' as const, power: 30 }
+    expect(getEligibleEvents(defaultEventPool, gobernadorNotReady).map((e) => e.id)).not.toContain('el_llamado_nacional')
+  })
+
+  it('accepting el_llamado_nacional promotes to ministro, from which la_presidencia is reachable exactly as via the senador route', () => {
+    const gobernadorReady = { ...startGame('popular'), role: 'gobernador' as const, power: 55 }
+    const afterLlamado = chooseEvent(gobernadorReady, elLlamadoNacional, elLlamadoNacional.choices[0])
+
+    expect(afterLlamado.role).toBe('ministro')
+    expect(getEligibleEvents(defaultEventPool, { ...afterLlamado, power: 75 }).map((e) => e.id)).toContain('la_presidencia')
+  })
+
+  it('senador and gobernador are parallel, independent routes into ministro — neither event fires for the other role', () => {
+    const senador = { ...startGame('popular'), role: 'senador' as const, power: 60 }
+    const gobernador = { ...senador, role: 'gobernador' as const }
+
+    expect(getEligibleEvents(defaultEventPool, senador).map((e) => e.id)).toContain('el_gabinete')
+    expect(getEligibleEvents(defaultEventPool, senador).map((e) => e.id)).not.toContain('el_llamado_nacional')
+    expect(getEligibleEvents(defaultEventPool, gobernador).map((e) => e.id)).toContain('el_llamado_nacional')
+    expect(getEligibleEvents(defaultEventPool, gobernador).map((e) => e.id)).not.toContain('el_gabinete')
+  })
+})
+
+describe('no accidental terminal roles among the career-ladder roles this fix covers', () => {
+  const READY_STATES: { role: Role; overrides: Partial<GameState> }[] = [
+    { role: 'concejal', overrides: { flags: ['trusted_by_party'] } },
+    { role: 'intendente', overrides: { power: 45 } },
+    { role: 'gobernador', overrides: { power: 55 } },
+    { role: 'senador', overrides: { power: 55 } },
+    { role: 'ministro', overrides: { power: 75 } },
+  ]
+
+  it.each(READY_STATES)('role $role has at least one event that can move the player out of it once ready', ({ role, overrides }) => {
+    const state: GameState = { ...startGame('popular'), role, ...overrides }
+    const eligible = getEligibleEvents(defaultEventPool, state)
+
+    const hasContinuation = eligible.some((event) => event.choices.some((choice) => choice.role && choice.role !== role))
+    expect(hasContinuation).toBe(true)
   })
 })
 

@@ -10,13 +10,18 @@ import { elFinancista } from './elFinancista'
 import { elFiscal } from './elFiscal'
 import { elGabinete } from './elGabinete'
 import { elJefePolitico } from './elJefePolitico'
+import { elLlamadoNacional } from './elLlamadoNacional'
 import { elNegocioConjunto } from './elNegocioConjunto'
 import { elOperadorDeConfianza } from './elOperadorDeConfianza'
 import { elPeriodista } from './elPeriodista'
+import { elPerfilTecnico } from './elPerfilTecnico'
+import { elPrestigioAcademico } from './elPrestigioAcademico'
+import { elReconocimientoPublico } from './elReconocimientoPublico'
 import { elSindicato } from './elSindicato'
 import { jefeTerritorial } from './jefeTerritorial'
 import { laAsesoria } from './laAsesoria'
 import { laCampana } from './laCampana'
+import { laColumnaDeOpinion } from './laColumnaDeOpinion'
 import { laDenuncia } from './laDenuncia'
 import { laDiputacion } from './laDiputacion'
 import { laEntrevista } from './laEntrevista'
@@ -30,8 +35,10 @@ import { laMovilizacion } from './laMovilizacion'
 import { laNegociacion } from './laNegociacion'
 import { laOperacionMediatica } from './laOperacionMediatica'
 import { laOportunidad } from './laOportunidad'
+import { laOrganizacionCivil } from './laOrganizacionCivil'
 import { laPresidencia } from './laPresidencia'
 import { laTraicion } from './laTraicion'
+import { laTransparencia } from './laTransparencia'
 import { laVeeduriaCiudadana } from './laVeeduriaCiudadana'
 import { losMedios } from './losMedios'
 
@@ -58,6 +65,8 @@ export const defaultEventPool: EventPool = [
   elFavorSindical,
   // --- puntero: party-specific — financista (liberal) ---
   elFinancista,
+  // --- puntero: party-specific — organización civil (progresista) ---
+  laOrganizacionCivil,
   // --- promotions out of puntero (alternative branches) ---
   laAsesoria,
   laOportunidad,
@@ -68,6 +77,13 @@ export const defaultEventPool: EventPool = [
   laInvestigacionEmpresario,
   elDesenlaceEmpresario,
   elNegocioConjunto,
+  // --- concejal: party-specific — civica chain (progresista) ---
+  laTransparencia,
+  elReconocimientoPublico,
+  // --- concejal: party-specific — tecnico/mediatico chain (progresista) ---
+  elPerfilTecnico,
+  laColumnaDeOpinion,
+  elPrestigioAcademico,
   // --- concejal: periodista chain ---
   laEntrevista,
   elPeriodista,
@@ -87,5 +103,6 @@ export const defaultEventPool: EventPool = [
   laIntendencia,
   laGobernacion,
   elGabinete,
+  elLlamadoNacional,
   laPresidencia,
 ]
