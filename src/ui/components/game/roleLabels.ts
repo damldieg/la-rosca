@@ -1,6 +1,8 @@
 import type { Role } from '@/core/domain/game/types/gameState'
 
 export const ROLE_LABELS: Record<Role, string> = {
+  militante: 'Militante',
+  referente: 'Referente',
   puntero: 'Puntero',
   concejal: 'Concejal',
   asesor: 'Asesor',

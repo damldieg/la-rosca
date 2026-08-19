@@ -1,4 +1,4 @@
-import type { DecisionEffects, Ideology, RelationshipId, Role } from './gameState'
+import type { CareerPathId, DecisionEffects, Ideology, RelationshipId, Role } from './gameState'
 
 export interface Decision {
   id: string
@@ -10,4 +10,5 @@ export interface Decision {
   removeFlags?: string[]
   durationMonths?: number
   role?: Role
+  careerPath?: CareerPathId
 }

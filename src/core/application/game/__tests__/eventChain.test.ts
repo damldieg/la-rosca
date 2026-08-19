@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { clubDelBarrio } from '../../../content/events/clubDelBarrio'
 import { defaultEventPool } from '../../../content/events'
+import { laPrimeraMilitancia } from '../../../content/events/laPrimeraMilitancia'
 import { elArchivoOAvance } from '../../../content/events/elArchivoOAvance'
 import { elAscenso } from '../../../content/events/elAscenso'
 import { elDebateMunicipal } from '../../../content/events/elDebateMunicipal'
@@ -57,7 +58,10 @@ describe('getNextEvent', () => {
   it('picks the first eligible event in pool order when the random roll is 0', () => {
     const state = startGame('popular')
 
-    expect(getNextEvent(state, new FixedRandomSource(0))).toEqual(clubDelBarrio)
+    // Fase 7.5: a fresh game now starts as militante, so the first eligible
+    // (and first in pool order) event is the militante-tier la_primera_militancia,
+    // not the puntero-tier club_del_barrio.
+    expect(getNextEvent(state, new FixedRandomSource(0))).toEqual(laPrimeraMilitancia)
   })
 })
 
@@ -145,6 +149,7 @@ describe('event chain: partido (jefe político -> interna -> traición -> ascens
     state = chooseEvent(state, elJefePolitico, elJefePolitico.choices[0]) // jurar_lealtad_al_jefe (+25)
     state = chooseEvent(state, laInterna, laInterna.choices[0]) // disciplinarte_a_la_lista_oficial (+10)
     state = chooseEvent(state, laTraicion, laTraicion.choices[0]) // mantenerte_leal (+15)
+    state = { ...state, age: 35 } // el_ascenso's age>=35 gate (Fase 7.5) — the chain above doesn't age the player that far on its own
 
     expect(state.relationships.jefePartidario).toBeGreaterThanOrEqual(40)
     expect(getEligibleEvents(defaultEventPool, state).map((e) => e.id)).toContain('el_ascenso')

@@ -29,6 +29,7 @@ export function simulateGame(config: SimulationConfig): SimulationResult {
   const random = new SeededRandomSource(seed)
 
   let state = startGame(partyId)
+  const startingAge = state.age
   const eventsVisited: string[] = []
   const eligibleCounts: Record<string, number> = {}
   let turns = 0
@@ -56,7 +57,10 @@ export function simulateGame(config: SimulationConfig): SimulationResult {
     seed,
     partyId,
     finalRole: state.role,
+    startingAge,
     finalAge: state.age,
+    careerPath: state.careerPath,
+    roleHistory: state.roleHistory,
     turns,
     gameOver,
     money: state.money,

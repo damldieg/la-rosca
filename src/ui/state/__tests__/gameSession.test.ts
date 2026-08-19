@@ -23,7 +23,7 @@ describe('gameSession store', () => {
     expect(session.phase).toBe('playing')
     if (session.phase !== 'playing') throw new Error('unreachable')
     expect(session.state.age).toBe(18)
-    expect(session.state.role).toBe('puntero')
+    expect(session.state.role).toBe('militante')
     expect(session.state.party).toBe('popular')
     expect(session.event).not.toBeNull()
   })

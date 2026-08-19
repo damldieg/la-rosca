@@ -8,9 +8,14 @@ export const laDiputacion: Event = {
     type: 'and',
     conditions: [
       { type: 'role', operator: 'equals', value: 'asesor' },
+      { type: 'age', operator: 'gte', value: 19 },
       { type: 'stat', stat: 'power', operator: 'gte', value: 20 },
     ],
   },
+  // repeatable (Fase 7.5): asesor has almost no other content of its own — a
+  // declined oneShot offer here would permanently strand the player at asesor,
+  // the same dead end la_candidatura_al_senado exists to prevent one tier up.
+  lifecycle: { type: 'repeatable' },
   choices: [
     {
       id: 'aceptar_banca',

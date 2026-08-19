@@ -8,6 +8,7 @@ export const laPresidencia: Event = {
     type: 'and',
     conditions: [
       { type: 'role', operator: 'equals', value: 'ministro' },
+      { type: 'age', operator: 'gte', value: 22 },
       { type: 'stat', stat: 'power', operator: 'gte', value: 70 },
     ],
   },

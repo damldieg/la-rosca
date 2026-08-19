@@ -13,6 +13,6 @@ export const liberal: PoliticalParty = {
   },
   preferredStats: ['money'],
   initialRelationships: { empresario: 15, periodista: -10 },
-  availableRoles: ['puntero', 'asesor', 'concejal', 'diputado', 'senador', 'ministro'],
+  availableRoles: ['militante', 'referente', 'puntero', 'asesor', 'concejal', 'diputado', 'senador', 'ministro'],
   preferredEventTags: ['económico', 'empresarial'],
 }

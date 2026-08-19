@@ -8,6 +8,7 @@ export const elGabinete: Event = {
     type: 'and',
     conditions: [
       { type: 'role', operator: 'equals', value: 'senador' },
+      { type: 'age', operator: 'gte', value: 20 },
       { type: 'stat', stat: 'power', operator: 'gte', value: 50 },
     ],
   },

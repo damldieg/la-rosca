@@ -1,7 +1,10 @@
 import { PARTIES } from '../../content/parties'
 import {
+  ageAtRoleAnalysis,
   careerDistribution,
   careerMilestoneAnalysis,
+  careerPathDistribution,
+  deadCareerPaths,
   deadEvents,
   dominantEvents,
   durationSummary,
@@ -38,11 +41,21 @@ export function generateReport(results: SimulationResult[]): string {
     const milestones = careerMilestoneAnalysis(partyResults)
     const replay = replayabilityAnalysis(partyResults)
     const falls = politicalFallCount(partyResults)
+    const paths = careerPathDistribution(partyResults)
+    const agesByRole = ageAtRoleAnalysis(partyResults)
 
     lines.push(`## ${party?.name ?? partyId} (${partyResults.length} games)`, '')
     lines.push('### Career distribution')
     for (const [role, count] of Object.entries(career)) {
       if (count) lines.push(`- ${role}: ${count.count} (${count.percentage.toFixed(1)}%)`)
+    }
+    lines.push('', '### Career path distribution')
+    for (const [path, count] of Object.entries(paths)) {
+      if (count) lines.push(`- ${path}: ${count.count} (${count.percentage.toFixed(1)}%)`)
+    }
+    lines.push('', '### Age reached per role (mean / min / max)')
+    for (const [role, summary] of Object.entries(agesByRole)) {
+      if (summary) lines.push(`- ${role}: ${summary.mean.toFixed(1)} / ${summary.min} / ${summary.max}`)
     }
     lines.push(
       '',
@@ -72,6 +85,16 @@ export function generateReport(results: SimulationResult[]): string {
       '',
     )
   }
+
+  const deadPaths = deadCareerPaths(results)
+  lines.push(
+    '## Career paths',
+    '',
+    deadPaths.length === 0
+      ? '- no dead career paths (every chosen path reached at least puntero somewhere)'
+      : `- dead career paths (chosen but never left militante/referente): ${deadPaths.join(', ')}`,
+    '',
+  )
 
   const stats = eventStats(results)
   const dominant = dominantEvents(stats)

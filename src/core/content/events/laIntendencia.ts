@@ -8,9 +8,11 @@ export const laIntendencia: Event = {
     type: 'and',
     conditions: [
       { type: 'role', operator: 'equals', value: 'concejal' },
+      { type: 'age', operator: 'gte', value: 20 },
       { type: 'flag', flag: 'trusted_by_party', operator: 'exists' },
     ],
   },
+  weightModifiers: [{ conditions: { type: 'careerPath', operator: 'equals', value: 'territorial' }, modifier: 15 }],
   choices: [
     {
       id: 'aceptar_candidatura_intendente',

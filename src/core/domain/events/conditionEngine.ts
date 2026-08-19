@@ -36,6 +36,10 @@ export function evaluateCondition(condition: Condition, state: GameState): boole
       return compareNumeric(state.age, condition.operator, condition.value)
     case 'relationship':
       return compareNumeric(state.relationships[condition.target] ?? 0, condition.operator, condition.value)
+    case 'careerPath':
+      return condition.operator === 'equals'
+        ? state.careerPath === condition.value
+        : state.careerPath !== condition.value
     case 'and':
       return condition.conditions.every((c) => evaluateCondition(c, state))
     case 'or':

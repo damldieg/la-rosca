@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { PoliticalParty } from '../../../party/types'
-import { createInitialGameState } from '../initialState'
+import { createInitialGameState, STARTING_AGE } from '../initialState'
 
 const testParty: PoliticalParty = {
   id: 'popular',
@@ -17,13 +17,15 @@ describe('createInitialGameState', () => {
   it('returns a valid initial state', () => {
     const state = createInitialGameState(testParty)
 
-    expect(state.age).toBe(18)
-    expect(state.date).toEqual({ years: 18, months: 0 })
-    expect(state.role).toBe('puntero')
+    expect(state.age).toBe(STARTING_AGE)
+    expect(state.date).toEqual({ years: 0, months: 0 }) // elapsed campaign time, separate from age (Fase 7.5)
+    expect(state.role).toBe('militante')
+    expect(state.careerPath).toBeUndefined()
     expect(state.exposure).toBe(0) // unknown politician, not yet on anyone's radar
     expect(state.flags).toEqual([])
     expect(state.relationships).toEqual({})
     expect(state.history).toEqual([])
+    expect(state.roleHistory).toEqual([{ role: 'militante', age: STARTING_AGE, gameDate: { years: 0, months: 0 } }])
   })
 
   it('stores the chosen party and its ideology profile', () => {

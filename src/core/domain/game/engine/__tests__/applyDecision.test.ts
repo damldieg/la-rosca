@@ -116,8 +116,16 @@ describe('applyDecision', () => {
     const state = freshState()
     const newState = applyDecision(state, { id: 'wait', durationMonths: 3 })
 
-    expect(newState.date).toEqual({ years: 18, months: 3 })
-    expect(newState.age).toBe(18)
+    expect(newState.date).toEqual({ years: 0, months: 3 })
+    expect(newState.age).toBe(18) // no full year elapsed yet — age unaffected
+  })
+
+  it('advances age once a full year elapses, derived from STARTING_AGE + date.years (Fase 7.5)', () => {
+    const state = freshState()
+    const newState = applyDecision(state, { id: 'wait_a_year', durationMonths: 14 })
+
+    expect(newState.date).toEqual({ years: 1, months: 2 })
+    expect(newState.age).toBe(19)
   })
 
   it('changes the role', () => {
@@ -125,6 +133,27 @@ describe('applyDecision', () => {
     const newState = applyDecision(state, { id: 'promotion', role: 'concejal' })
 
     expect(newState.role).toBe('concejal')
+  })
+
+  it('sets the careerPath', () => {
+    const state = freshState()
+    const newState = applyDecision(state, { id: 'orientation', careerPath: 'territorial' })
+
+    expect(newState.careerPath).toBe('territorial')
+  })
+
+  it('appends to roleHistory only when the role actually changes (Fase 7.5)', () => {
+    const state = freshState()
+    expect(state.roleHistory).toEqual([{ role: 'militante', age: 18, gameDate: { years: 0, months: 0 } }])
+
+    const unchanged = applyDecision(state, { id: 'no_promotion', durationMonths: 2 })
+    expect(unchanged.roleHistory).toHaveLength(1)
+
+    const promoted = applyDecision(unchanged, { id: 'promotion', role: 'referente', durationMonths: 14 })
+    expect(promoted.roleHistory).toEqual([
+      { role: 'militante', age: 18, gameDate: { years: 0, months: 0 } },
+      { role: 'referente', age: 19, gameDate: { years: 1, months: 4 } },
+    ])
   })
 
   it('registers the decision in history', () => {
@@ -138,7 +167,7 @@ describe('applyDecision', () => {
     expect(newState.history).toHaveLength(1)
     expect(newState.history[0]).toEqual({
       decisionId: 'accept_bribe',
-      gameDate: { years: 18, months: 3 },
+      gameDate: { years: 0, months: 3 },
       effects: { money: 20 },
     })
   })

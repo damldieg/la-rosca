@@ -70,6 +70,6 @@ describe('simulateGame: termination', () => {
     expect(result.gameOver).toBe(true)
     expect(result.eventsVisited).toEqual([])
     expect(result.historyLength).toBe(0)
-    expect(result.finalRole).toBe('puntero') // unchanged: no decision was ever applied
+    expect(result.finalRole).toBe('militante') // unchanged: no decision was ever applied
   })
 })

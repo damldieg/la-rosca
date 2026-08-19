@@ -8,11 +8,16 @@ export const elAscenso: Event = {
     type: 'and',
     conditions: [
       { type: 'role', operator: 'equals', value: 'concejal' },
+      { type: 'age', operator: 'gte', value: 20 },
       { type: 'relationship', target: 'jefePartidario', operator: 'gte', value: 40 },
     ],
   },
   lifecycle: { type: 'milestone' },
   chainId: 'partido',
+  weightModifiers: [
+    { conditions: { type: 'careerPath', operator: 'equals', value: 'territorial' }, modifier: 10 },
+    { conditions: { type: 'careerPath', operator: 'equals', value: 'institucional' }, modifier: 10 },
+  ],
   choices: [
     {
       id: 'aceptar_la_banca_de_senador',

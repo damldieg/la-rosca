@@ -21,6 +21,7 @@ import { elPeriodista } from './elPeriodista'
 import { elPerfilTecnico } from './elPerfilTecnico'
 import { elPrestigioAcademico } from './elPrestigioAcademico'
 import { elReconocimientoPublico } from './elReconocimientoPublico'
+import { elReferente } from './elReferente'
 import { elRivalInterno } from './elRivalInterno'
 import { elSindicato } from './elSindicato'
 import { jefeTerritorial } from './jefeTerritorial'
@@ -29,8 +30,10 @@ import { laAuditoriaDeContratos } from './laAuditoriaDeContratos'
 import { laCaidaGubernamental } from './laCaidaGubernamental'
 import { laCaidaMinisterial } from './laCaidaMinisterial'
 import { laCampana } from './laCampana'
+import { laCandidaturaAlSenado } from './laCandidaturaAlSenado'
 import { laCoherenciaCuestionada } from './laCoherenciaCuestionada'
 import { laColumnaDeOpinion } from './laColumnaDeOpinion'
+import { laConsolidacionTerritorial } from './laConsolidacionTerritorial'
 import { laCrisisTerritorial } from './laCrisisTerritorial'
 import { laDenuncia } from './laDenuncia'
 import { laDiputacion } from './laDiputacion'
@@ -50,9 +53,12 @@ import { laNegociacion } from './laNegociacion'
 import { laOperacionMediatica } from './laOperacionMediatica'
 import { laOportunidad } from './laOportunidad'
 import { laOrganizacionCivil } from './laOrganizacionCivil'
+import { laOrientacionPolitica } from './laOrientacionPolitica'
 import { laPerdidaDeFinanciacion } from './laPerdidaDeFinanciacion'
 import { laPerdidaDeLaCandidatura } from './laPerdidaDeLaCandidatura'
 import { laPresidencia } from './laPresidencia'
+import { laPrimeraMilitancia } from './laPrimeraMilitancia'
+import { laRedDeContactos } from './laRedDeContactos'
 import { laSupervivenciaDelEscandalo } from './laSupervivenciaDelEscandalo'
 import { laTraicion } from './laTraicion'
 import { laTransparencia } from './laTransparencia'
@@ -67,6 +73,12 @@ import { losMedios } from './losMedios'
  * events eligible in the first place.
  */
 export const defaultEventPool: EventPool = [
+  // --- militante/referente: early career, shared (Fase 7.5) ---
+  laPrimeraMilitancia,
+  laRedDeContactos,
+  laOrientacionPolitica,
+  elReferente,
+  laConsolidacionTerritorial,
   // --- puntero: build-up, shared ---
   clubDelBarrio,
   jefeTerritorial,
@@ -117,6 +129,7 @@ export const defaultEventPool: EventPool = [
   elAscenso,
   // --- senior promotions ---
   laDiputacion,
+  laCandidaturaAlSenado,
   laIntendencia,
   laGobernacion,
   elGabinete,

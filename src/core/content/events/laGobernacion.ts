@@ -8,6 +8,7 @@ export const laGobernacion: Event = {
     type: 'and',
     conditions: [
       { type: 'role', operator: 'equals', value: 'intendente' },
+      { type: 'age', operator: 'gte', value: 21 },
       { type: 'stat', stat: 'power', operator: 'gte', value: 40 },
     ],
   },

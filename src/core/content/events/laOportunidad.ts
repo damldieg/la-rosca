@@ -8,6 +8,7 @@ export const laOportunidad: Event = {
     type: 'and',
     conditions: [
       { type: 'role', operator: 'equals', value: 'puntero' },
+      { type: 'age', operator: 'gte', value: 20 },
       { type: 'flag', flag: 'helped_local_club', operator: 'exists' },
     ],
   },

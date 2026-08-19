@@ -1,5 +1,6 @@
 import type { Decision } from '../types/decision'
 import type { GameState, Ideology } from '../types/gameState'
+import { STARTING_AGE } from '../state/initialState'
 import { clamp } from './clamp'
 import { advanceTime } from './time'
 
@@ -33,14 +34,18 @@ export function applyDecision(state: GameState, decision: Decision): GameState {
   const flags = [...new Set([...state.flags, ...addFlags])].filter((flag) => !removeFlags.has(flag))
 
   const role = decision.role ?? state.role
+  const careerPath = decision.careerPath ?? state.careerPath
 
   const date = decision.durationMonths ? advanceTime(state.date, decision.durationMonths) : state.date
-  const age = date.years
+  const age = STARTING_AGE + date.years
 
   const history = [
     ...state.history,
     { decisionId: decision.id, gameDate: date, effects },
   ]
+
+  const roleHistory =
+    role !== state.role ? [...state.roleHistory, { role, age, gameDate: date }] : state.roleHistory
 
   return {
     ...state,
@@ -50,8 +55,10 @@ export function applyDecision(state: GameState, decision: Decision): GameState {
     relationships,
     flags,
     role,
+    careerPath,
     date,
     age,
     history,
+    roleHistory,
   }
 }

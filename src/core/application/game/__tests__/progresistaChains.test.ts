@@ -13,8 +13,8 @@ import { startGame } from '../startGame'
 
 describe('civica chain: la_organizacion_civil -> la_transparencia -> el_reconocimiento_publico', () => {
   it('la_organizacion_civil is only eligible for a progresista puntero', () => {
-    const progresista = startGame('progresista')
-    const popular = startGame('popular')
+    const progresista: GameState = { ...startGame('progresista'), role: 'puntero' }
+    const popular: GameState = { ...startGame('popular'), role: 'puntero' }
 
     expect(getEligibleEvents(defaultEventPool, progresista).map((e) => e.id)).toContain('la_organizacion_civil')
     expect(getEligibleEvents(defaultEventPool, popular).map((e) => e.id)).not.toContain('la_organizacion_civil')

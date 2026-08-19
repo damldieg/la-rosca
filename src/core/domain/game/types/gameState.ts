@@ -1,6 +1,8 @@
 import type { PartyId } from '../../party/types'
 
 export type Role =
+  | 'militante'
+  | 'referente'
   | 'puntero'
   | 'concejal'
   | 'asesor'
@@ -11,7 +13,22 @@ export type Role =
   | 'ministro'
   | 'presidente'
 
-/** Elapsed in-game time, precise to the month. */
+/**
+ * Which trajectory a career is following — territory, technocracy, business,
+ * unions, media, or institutions. Descriptive/weighting metadata, not a rigid
+ * class: it never gates an event on its own, only nudges weights and flavors
+ * narrative (see WeightModifier usage in content). Set by la_orientacion_politica,
+ * unset until then.
+ */
+export type CareerPathId = 'territorial' | 'tecnica' | 'empresarial' | 'sindical' | 'mediatica' | 'institucional'
+
+/**
+ * Elapsed in-game time since the campaign started, precise to the month —
+ * always starts at { years: 0, months: 0 }. Distinct from the character's own
+ * `age` (see GameState.age): time elapsed in the world vs. years lived by the
+ * politician, even though today both simply advance in lockstep from a fixed
+ * starting age.
+ */
 export interface GameDate {
   years: number
   months: number
@@ -57,10 +74,19 @@ export interface HistoryEntry {
   effects: DecisionEffects
 }
 
+/** One entry per actual role change (including the starting role) — see applyDecision.ts. */
+export interface RoleHistoryEntry {
+  role: Role
+  age: number
+  gameDate: GameDate
+}
+
 export interface GameState {
+  /** Character age in years — see GameDate's own doc comment for how this differs from `date`. */
   age: number
   date: GameDate
   role: Role
+  careerPath?: CareerPathId
   party: PartyId
   ideology: Ideology
   money: number
@@ -73,4 +99,5 @@ export interface GameState {
   flags: string[]
   relationships: Record<RelationshipId, number>
   history: HistoryEntry[]
+  roleHistory: RoleHistoryEntry[]
 }

@@ -14,6 +14,7 @@ export const elLlamadoNacional: Event = {
     type: 'and',
     conditions: [
       { type: 'role', operator: 'equals', value: 'gobernador' },
+      { type: 'age', operator: 'gte', value: 22 },
       { type: 'stat', stat: 'power', operator: 'gte', value: 50 },
     ],
   },

@@ -1,4 +1,4 @@
-import type { Role } from '../../domain/game/types/gameState'
+import type { CareerPathId, Role } from '../../domain/game/types/gameState'
 import type { PartyId } from '../../domain/party/types'
 import type { SimulationResult } from './types'
 
@@ -205,4 +205,65 @@ export function careerMilestoneAnalysis(results: SimulationResult[]): CareerMile
       presidente: reachedPresidente / total,
     },
   }
+}
+
+/**
+ * Mean age (across a batch) at which each role was first reached, derived
+ * from each game's roleHistory (Fase 7.5) — answers "how old is a typical
+ * gobernador/presidente" without re-deriving role transitions from raw event
+ * history.
+ */
+export type AgeAtRoleAnalysis = Partial<Record<Role, ResourceSummary>>
+
+export function ageAtRoleAnalysis(results: SimulationResult[]): AgeAtRoleAnalysis {
+  const agesByRole: Partial<Record<Role, number[]>> = {}
+  for (const result of results) {
+    for (const entry of result.roleHistory) {
+      ;(agesByRole[entry.role] ??= []).push(entry.age)
+    }
+  }
+
+  const analysis: AgeAtRoleAnalysis = {}
+  for (const [role, ages] of Object.entries(agesByRole)) {
+    if (ages) analysis[role as Role] = summarize(ages)
+  }
+  return analysis
+}
+
+export interface CareerPathCount {
+  count: number
+  percentage: number
+}
+
+/** Distribution of the careerPath chosen via la_orientacion_politica — mirrors careerDistribution's shape. */
+export type CareerPathDistribution = Partial<Record<CareerPathId, CareerPathCount>> & { none: CareerPathCount }
+
+export function careerPathDistribution(results: SimulationResult[]): CareerPathDistribution {
+  const distribution = { none: { count: 0, percentage: 0 } } as CareerPathDistribution
+  for (const result of results) {
+    const key = result.careerPath ?? 'none'
+    const entry = (distribution[key] ??= { count: 0, percentage: 0 })
+    entry.count += 1
+  }
+  for (const entry of Object.values(distribution)) {
+    if (entry) entry.percentage = (entry.count / results.length) * 100
+  }
+  return distribution
+}
+
+const ALL_CAREER_PATHS: CareerPathId[] = ['territorial', 'tecnica', 'empresarial', 'sindical', 'mediatica', 'institucional']
+const PRE_CAREER_ROLES: Role[] = ['militante', 'referente']
+
+/**
+ * A careerPath is "dead" when it was actually chosen (at least once, across
+ * the whole batch) but never once carried a game past the pre-puntero roles —
+ * distinguishes "nobody picked this path" from "this path picked but goes
+ * nowhere", the real failure mode spec §19 asks to catch.
+ */
+export function deadCareerPaths(results: SimulationResult[]): CareerPathId[] {
+  return ALL_CAREER_PATHS.filter((path) => {
+    const withPath = results.filter((r) => r.careerPath === path)
+    if (withPath.length === 0) return false
+    return withPath.every((r) => PRE_CAREER_ROLES.includes(r.finalRole))
+  })
 }

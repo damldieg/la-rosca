@@ -15,8 +15,9 @@ const testParty: PoliticalParty = {
   preferredEventTags: [],
 }
 
+/** role: 'puntero', not the real 'militante' starting role — these fixtures test generic condition mechanics, not the early career itself (see careerPaths.test.ts for that). */
 function freshState() {
-  return createInitialGameState(testParty)
+  return { ...createInitialGameState(testParty), role: 'puntero' as const }
 }
 
 describe('evaluateCondition', () => {

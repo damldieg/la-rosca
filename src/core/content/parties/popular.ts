@@ -13,6 +13,16 @@ export const popular: PoliticalParty = {
   },
   preferredStats: ['structure', 'power'],
   initialRelationships: { sindicalista: 15, empresario: -10 },
-  availableRoles: ['puntero', 'concejal', 'intendente', 'gobernador', 'senador', 'ministro', 'presidente'],
+  availableRoles: [
+    'militante',
+    'referente',
+    'puntero',
+    'concejal',
+    'intendente',
+    'gobernador',
+    'senador',
+    'ministro',
+    'presidente',
+  ],
   preferredEventTags: ['sindical', 'territorial'],
 }

@@ -15,11 +15,21 @@ export const BASE_INITIAL_STATS = {
   exposure: 0,
 } as const
 
+/**
+ * Age every playthrough starts at, regardless of party — a young militante,
+ * not yet a political operator (see Role: starts at 'militante'). Narrative
+ * coherence, not a modeled real-world minimum (Fase 7.5).
+ */
+export const STARTING_AGE = 18
+
 export function createInitialGameState(party: PoliticalParty): GameState {
+  const date = { years: 0, months: 0 }
+  const role = 'militante' as const
+
   return {
-    age: 18,
-    date: { years: 18, months: 0 },
-    role: 'puntero',
+    age: STARTING_AGE,
+    date,
+    role,
     party: party.id,
     ideology: { ...party.ideology },
     money: 0,
@@ -28,5 +38,6 @@ export function createInitialGameState(party: PoliticalParty): GameState {
     flags: [],
     relationships: { ...(party.initialRelationships ?? {}) },
     history: [],
+    roleHistory: [{ role, age: STARTING_AGE, gameDate: date }],
   }
 }

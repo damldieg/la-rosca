@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { SimulationResult } from '../types'
 import {
+  ageAtRoleAnalysis,
   careerDistribution,
   careerMilestoneAnalysis,
+  careerPathDistribution,
+  deadCareerPaths,
   deadEvents,
   dominantEvents,
   durationSummary,
@@ -18,7 +21,10 @@ function fixture(overrides: Partial<SimulationResult> = {}): SimulationResult {
     seed: 1,
     partyId: 'popular',
     finalRole: 'puntero',
+    startingAge: 18,
     finalAge: 20,
+    careerPath: undefined,
+    roleHistory: [{ role: 'militante', age: 18, gameDate: { years: 0, months: 0 } }],
     turns: 3,
     gameOver: true,
     money: 100,
@@ -174,5 +180,63 @@ describe('careerMilestoneAnalysis', () => {
     expect(analysis.reachedSenadorOrAbove).toBe(3)
     expect(analysis.reachedMinistroOrAbove).toBe(2)
     expect(analysis.reachedPresidente).toBe(1)
+  })
+})
+
+describe('ageAtRoleAnalysis (Fase 7.5)', () => {
+  it('summarizes the age each role was first reached across a batch, from roleHistory', () => {
+    const results = [
+      fixture({
+        roleHistory: [
+          { role: 'militante', age: 18, gameDate: { years: 0, months: 0 } },
+          { role: 'puntero', age: 21, gameDate: { years: 3, months: 0 } },
+        ],
+      }),
+      fixture({
+        roleHistory: [
+          { role: 'militante', age: 18, gameDate: { years: 0, months: 0 } },
+          { role: 'puntero', age: 23, gameDate: { years: 5, months: 0 } },
+        ],
+      }),
+    ]
+
+    const analysis = ageAtRoleAnalysis(results)
+    expect(analysis.militante).toEqual({ mean: 18, min: 18, max: 18 })
+    expect(analysis.puntero).toEqual({ mean: 22, min: 21, max: 23 })
+    expect(analysis.senador).toBeUndefined()
+  })
+})
+
+describe('careerPathDistribution (Fase 7.5)', () => {
+  it('counts games by careerPath, grouping unset paths under "none"', () => {
+    const results = [
+      fixture({ careerPath: 'territorial' }),
+      fixture({ careerPath: 'territorial' }),
+      fixture({ careerPath: 'tecnica' }),
+      fixture({ careerPath: undefined }),
+    ]
+
+    const dist = careerPathDistribution(results)
+    expect(dist.territorial).toEqual({ count: 2, percentage: 50 })
+    expect(dist.tecnica).toEqual({ count: 1, percentage: 25 })
+    expect(dist.none).toEqual({ count: 1, percentage: 25 })
+  })
+})
+
+describe('deadCareerPaths (Fase 7.5)', () => {
+  it('flags a path that was chosen but never carried any game past militante/referente', () => {
+    const results = [
+      fixture({ careerPath: 'sindical', finalRole: 'militante' }),
+      fixture({ careerPath: 'sindical', finalRole: 'referente' }),
+      fixture({ careerPath: 'territorial', finalRole: 'gobernador' }),
+    ]
+
+    expect(deadCareerPaths(results)).toEqual(['sindical'])
+  })
+
+  it('does not flag a path nobody chose at all — that is a distribution question, not a dead-path bug', () => {
+    const results = [fixture({ careerPath: 'territorial', finalRole: 'gobernador' })]
+
+    expect(deadCareerPaths(results)).not.toContain('mediatica')
   })
 })

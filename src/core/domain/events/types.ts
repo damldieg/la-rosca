@@ -1,11 +1,11 @@
 import type { Decision } from '../game/types/decision'
-import type { DecisionEffects, Ideology, RelationshipId, Role } from '../game/types/gameState'
+import type { CareerPathId, DecisionEffects, Ideology, RelationshipId, Role } from '../game/types/gameState'
 import type { PartyId } from '../party/types'
 
 /**
  * A discriminated-union tree: leaf conditions (role, flag, stat, party, ideology,
- * age, relationship) plus AND/OR combinators. A new leaf type can be added later
- * as another union member without changing evaluateCondition's shape.
+ * age, relationship, careerPath) plus AND/OR combinators. A new leaf type can be
+ * added later as another union member without changing evaluateCondition's shape.
  */
 export type Condition =
   | RoleCondition
@@ -15,6 +15,7 @@ export type Condition =
   | IdeologyCondition
   | AgeCondition
   | RelationshipCondition
+  | CareerPathCondition
   | AndCondition
   | OrCondition
 
@@ -63,6 +64,12 @@ export interface RelationshipCondition {
   target: RelationshipId
   operator: NumericOperator
   value: number
+}
+
+export interface CareerPathCondition {
+  type: 'careerPath'
+  operator: 'equals' | 'not_equals'
+  value: CareerPathId
 }
 
 export interface AndCondition {

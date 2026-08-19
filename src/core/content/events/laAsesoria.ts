@@ -9,6 +9,7 @@ export const laAsesoria: Event = {
     type: 'and',
     conditions: [
       { type: 'role', operator: 'equals', value: 'puntero' },
+      { type: 'age', operator: 'gte', value: 20 },
       {
         type: 'or',
         conditions: [
@@ -19,6 +20,10 @@ export const laAsesoria: Event = {
       { type: 'stat', stat: 'popularity', operator: 'gte', value: 30 },
     ],
   },
+  weightModifiers: [
+    { conditions: { type: 'careerPath', operator: 'equals', value: 'tecnica' }, modifier: 15 },
+    { conditions: { type: 'careerPath', operator: 'equals', value: 'institucional' }, modifier: 10 },
+  ],
   choices: [
     {
       id: 'aceptar_asesoria',

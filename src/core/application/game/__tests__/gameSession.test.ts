@@ -7,7 +7,7 @@ describe('application: game session', () => {
     const state = startGame('popular')
 
     expect(state.age).toBe(18)
-    expect(state.role).toBe('puntero')
+    expect(state.role).toBe('militante')
   })
 
   it('orchestrates a decision against the current GameState via the domain engine', () => {
